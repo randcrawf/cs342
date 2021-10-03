@@ -15,7 +15,6 @@ class ClassificationLoss(torch.nn.Module):
 
         Hint: Don't be too fancy, this is a one-liner
         """
-        print("here1")
         return F.cross_entropy(input, target)
 
 class CNNClassifier(torch.nn.Module):
@@ -32,7 +31,6 @@ class CNNClassifier(torch.nn.Module):
             )
 
         def forward(self, x):
-            print("here3")
             return self.net(x)
 
     def __init__(self):
@@ -42,7 +40,6 @@ class CNNClassifier(torch.nn.Module):
         super().__init__()
 
         input_channels = 3
-        num_classes = 10
         n_layers = 3
         width = 64
 
@@ -53,10 +50,9 @@ class CNNClassifier(torch.nn.Module):
 
         for i in range(n_layers):
             l.append(self.Block(c_in, c_out, stride=(i + 1) % 2 + 1))
-            c_in = c_out
 
         self.feature_extractor = torch.nn.Sequential(*l)
-        self.linear = torch.nn.Linear(c_in, num_classes)
+        self.linear = torch.nn.Linear(c_in, 10)
 
     def forward(self, x):
         """
