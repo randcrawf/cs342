@@ -32,14 +32,14 @@ def train(args):
         loss_vals, acc_vals, vacc_vals = [], [], []
         for im, label in train_data:
             im, label= im.to(device), label.to(device)
-            label_pred = model(im)
-            loss_val = loss(label_pred, label)
-            acc_val = accuracy(label_pred, label)
+            pred = model(im)
+            loss_val = loss(pred, label)
+            acc_val = accuracy(pred, label)
 
             loss_vals.append(loss_val.detach().cpu().numpy())
             acc_vals.append(acc_val.detach().cpu().numpy())
-            loss_val.backward()
             optim.step()
+            loss_val.backward()
             optim.zero_grad()
             global_step += 1
 
