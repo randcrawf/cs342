@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 
 class ClassificationLoss(torch.nn.Module):
     def forward(self, input, target):
