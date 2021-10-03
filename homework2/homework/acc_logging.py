@@ -12,19 +12,26 @@ def test_logging(train_logger, valid_logger):
     Make sure to set global_step correctly, for epoch=0, iteration=0: global_step=0
     Call the loss 'loss', and accuracy 'accuracy' (no slash or other namespace)
     """
-
+    global_step = 0
     # This is a strongly simplified training loop
     for epoch in range(10):
+        train_accuracy_sum = 0
+        valid_accuracy_sum = 0
         torch.manual_seed(epoch)
         for iteration in range(20):
             dummy_train_loss = 0.9**(epoch+iteration/20.)
             dummy_train_accuracy = epoch/10. + torch.randn(10)
-            raise NotImplementedError('Log the training loss')
-        raise NotImplementedError('Log the training accuracy')
+            train_logger.add_scalar('loss', dummy_train_loss, global_step)
+            train_accuracy_sum += dummy_train_accuracy.mean().item()
+            global_step += 1
+        train_accuracy = train_accuracy_sum / 20.
+        train_logger.add_scalar('accuracy', train_accuracy, global_step)
         torch.manual_seed(epoch)
         for iteration in range(10):
             dummy_validation_accuracy = epoch / 10. + torch.randn(10)
-        raise NotImplementedError('Log the validation accuracy')
+            valid_accuracy_sum += dummy_validation_accuracy.mean().item()
+        valid_accuracy = valid_accuracy_sum / 10.
+        valid_logger.add_scalar('accuracy', valid_accuracy, global_step)
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
