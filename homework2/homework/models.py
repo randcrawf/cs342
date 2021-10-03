@@ -42,6 +42,7 @@ class CNNClassifier(torch.nn.Module):
         super().__init__()
 
         input_channels = 3
+        num_classes = 10
         n_layers = 3
         width = 64
 
@@ -55,7 +56,7 @@ class CNNClassifier(torch.nn.Module):
             c_in = c_out
 
         self.feature_extractor = torch.nn.Sequential(*l)
-        self.linear = torch.nn.Linear(c_in, 10)
+        self.linear = torch.nn.Linear(c_in, num_classes)
 
     def forward(self, x):
         """
