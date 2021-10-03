@@ -40,21 +40,19 @@ class CNNClassifier(torch.nn.Module):
         super().__init__()
 
         input_channels = 3
-        num_classes = 10
         n_layers = 3
         width = 64
 
         c_in = width
         c_out = width
 
-        layers = list()
-        layers.append(torch.nn.Conv2d(input_channels, c_out, 3, padding=1))
+        l = [torch.nn.Conv2d(input_channels, c_out, 3, padding=1)]
 
         for i in range(n_layers):
-            layers.append(self.Block(c_in, c_out, stride=(i + 1) % 2 + 1))
+            l.append(self.Block(c_in, c_out, stride=(i + 1) % 2 + 1))
 
-        self.feature_extractor = torch.nn.Sequential(*layers)
-        self.linear = torch.nn.Linear(c_in, num_classes)
+        self.feature_extractor = torch.nn.Sequential(*l)
+        self.classifier = torch.nn.Linear(c_in, 10)
 
     def forward(self, x):
         """
@@ -69,7 +67,7 @@ class CNNClassifier(torch.nn.Module):
         x = self.feature_extractor(x)
         x = x.mean((2, 3))
 
-        return self.linear(x)
+        return self.classifier(x)
 
 
 def save_model(model):
