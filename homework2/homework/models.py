@@ -60,7 +60,6 @@ class CNNClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
-        print("here2")
         x[:, 0] = (x[:, 0] - 0.5) / 0.5
         x[:, 1] = (x[:, 1] - 0.5) / 0.5
         x[:, 2] = (x[:, 2] - 0.5) / 0.5 
