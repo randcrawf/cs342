@@ -23,10 +23,11 @@ def train(args):
     print("Loading data...")
     train_data = load_data('data/train')
     valid_data = load_data('data/valid')
-    print("Training...")
 
     global_step = 0
     for epoch in range(args.num_epoch):
+        print("epoch #" + str(epoch))
+        print("Training...")
         model.train()
         loss_vals, acc_vals, vacc_vals = [], [], []
         for im, label in train_data:
@@ -44,16 +45,16 @@ def train(args):
 
         avg_loss = sum(loss_vals) / len(loss_vals)
         avg_acc = sum(acc_vals) / len(acc_vals)
-
+        train_logger.add_scalar('accuracy', avg_acc, global_step)
         model.eval()
-        print("Validating")
+        print("Validating...")
         for img, label in valid_data:
             img, label = img.to(device), label.to(device)
             vacc_vals.append(accuracy(model(img), label).detach().cpu().numpy())
             
 
         avg_vacc = sum(vacc_vals) / len(vacc_vals)
-
+        valid_logger.add_scalar('accuracy', avg_vacc, global_step)
         print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
 
 
