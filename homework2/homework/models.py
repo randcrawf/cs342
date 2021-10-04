@@ -45,7 +45,7 @@ class CNNClassifier(torch.nn.Module):
             l.append(self.Block(c, c, stride=s))
 
         self.feature_extractor = torch.nn.Sequential(*l)
-        self.linear = torch.nn.Linear(c, 10)
+        self.classifier = torch.nn.Linear(c, 10)
 
     def forward(self, x):
         """
@@ -53,10 +53,10 @@ class CNNClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
-        x[:, :] = x[:, :] * 2 - 1
+        #x[:, :] = x[:, :] * 2 - 1
 
         x = self.feature_extractor(x).mean(3).mean(2)
-        return self.linear(x)
+        return self.classifier(x)
 
 
 def save_model(model):
