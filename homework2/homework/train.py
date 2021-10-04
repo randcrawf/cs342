@@ -24,7 +24,7 @@ def train(args):
     print("Loading data...")
     train_data = load_data('data/train')
     valid_data = load_data('data/valid')
-
+    torch.autograd.set_detect_anomaly(True)
     global_step = 0
     for epoch in range(args.num_epoch):
         print("epoch #" + str(epoch))
@@ -39,9 +39,9 @@ def train(args):
 
             loss_vals.append(loss_val.detach().cpu().numpy())
             acc_vals.append(acc_val.detach().cpu().numpy())
-            optimizer.step()
-            loss_val.backward()
             optimizer.zero_grad()
+            loss_val.backward()
+            optimizer.step()
             global_step += 1
 
         avg_loss = sum(loss_vals) / len(loss_vals)
@@ -59,7 +59,6 @@ def train(args):
         print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
 
 
-    save_model(model)
     save_model(model)
 
 

@@ -19,10 +19,11 @@ class ClassificationLoss(torch.nn.Module):
 
 class CNNClassifier(torch.nn.Module):
     class Block(torch.nn.Module):
+        #https://www.programcreek.com/python/example/107671/torch.nn.BatchNorm2d
         def __init__(self, n_input, n_output, stride=1):
             super().__init__()
             self.net = torch.nn.Sequential(
-                torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=1, padding=1),
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU(),
                 torch.nn.Conv2d(n_output, n_output, kernel_size=3, stride=stride, padding=1),
@@ -39,20 +40,15 @@ class CNNClassifier(torch.nn.Module):
         """
         super().__init__()
 
-        input_channels = 3
-        n_layers = 3
-        width = 64
+        c = 64
+        l = [torch.nn.Conv2d(3, c, 3, padding=1), torch.nn.ReLU()]
+        strides = [1,2,1,1,1,2]
 
-        c_in = width
-        c_out = width
-
-        l = [torch.nn.Conv2d(input_channels, c_out, 3, padding=1)]
-
-        for i in range(n_layers):
-            l.append(self.Block(c_in, c_out, stride=(i + 1) % 2 + 1))
+        for s in strides:
+            l.append(self.Block(c, c, stride=s))
 
         self.feature_extractor = torch.nn.Sequential(*l)
-        self.linear = torch.nn.Linear(c_in, 10)
+        self.linear = torch.nn.Linear(c, 10)
 
     def forward(self, x):
         """
@@ -60,13 +56,9 @@ class CNNClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
-        x[:, 0] = (x[:, 0] - 0.5) / 0.5
-        x[:, 1] = (x[:, 1] - 0.5) / 0.5
-        x[:, 2] = (x[:, 2] - 0.5) / 0.5 
+        x[:, :] = x[:, :] * 2 - 1
 
-        x = self.feature_extractor(x)
-        x = x.mean((2, 3))
-
+        x = self.feature_extractor(x).mean(3).mean(2)
         return self.linear(x)
 
 
