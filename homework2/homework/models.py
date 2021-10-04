@@ -26,9 +26,9 @@ class CNNClassifier(torch.nn.Module):
                 torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU(),
-                torch.nn.Conv2d(n_output, n_output, kernel_size=3, stride=stride, padding=1),
-                torch.nn.BatchNorm2d(n_output),
-                torch.nn.ReLU()
+                # torch.nn.Conv2d(n_output, n_output, kernel_size=3, stride=stride, padding=1),
+                # torch.nn.BatchNorm2d(n_output),
+                # torch.nn.ReLU()
             )
 
         def forward(self, x):
