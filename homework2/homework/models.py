@@ -38,7 +38,7 @@ class CNNClassifier(torch.nn.Module):
 
         c = 64
         l = [torch.nn.Conv2d(3, c, 3, padding=1), torch.nn.ReLU()]
-        strides = [1,2,1,2,1,2]
+        strides = [1,2,1,2,1,2,1,2]
 
         for s in strides:
             l.append(self.Block(c, c, stride=s))
