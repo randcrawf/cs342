@@ -19,7 +19,6 @@ class ClassificationLoss(torch.nn.Module):
 
 class CNNClassifier(torch.nn.Module):
     class Block(torch.nn.Module):
-        #https://www.programcreek.com/python/example/107671/torch.nn.BatchNorm2d
         def __init__(self, n_input, n_output, stride=1):
             super().__init__()
             self.net = torch.nn.Sequential(
