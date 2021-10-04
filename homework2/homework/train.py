@@ -18,6 +18,10 @@ def train(args):
     """
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)
+    # if args.continue_training:
+    #     from os import path
+    #     model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), '%s.th' % args.model)))
+
 
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
     loss = ClassificationLoss()
@@ -28,7 +32,7 @@ def train(args):
     global_step = 0
     for epoch in range(args.num_epoch):
         print("epoch #" + str(epoch))
-        print("Training....")
+        print("Training...")
         model.train()
         loss_vals, acc_vals, vacc_vals = [], [], []
         for im, label in train_data:

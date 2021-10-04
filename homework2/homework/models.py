@@ -25,10 +25,7 @@ class CNNClassifier(torch.nn.Module):
             self.net = torch.nn.Sequential(
                 torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
                 torch.nn.BatchNorm2d(n_output),
-                torch.nn.ReLU(),
-                # torch.nn.Conv2d(n_output, n_output, kernel_size=3, stride=stride, padding=1),
-                # torch.nn.BatchNorm2d(n_output),
-                # torch.nn.ReLU()
+                torch.nn.ReLU()
             )
 
         def forward(self, x):
@@ -42,7 +39,7 @@ class CNNClassifier(torch.nn.Module):
 
         c = 64
         l = [torch.nn.Conv2d(3, c, 3, padding=1), torch.nn.ReLU()]
-        strides = [1,2,1,1,1,2]
+        strides = [1,2,1,2,1,2]
 
         for s in strides:
             l.append(self.Block(c, c, stride=s))
