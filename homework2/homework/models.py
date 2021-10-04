@@ -53,8 +53,6 @@ class CNNClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
-        #x[:, :] = x[:, :] * 2 - 1
-
         x = self.feature_extractor(x).mean(3).mean(2)
         return self.classifier(x)
 
