@@ -76,6 +76,6 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--num_epoch', type=int, default=50)
     parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
     parser.add_argument('-mo', '--momentum', type=float, default=.9)
-    parser.add_argument('-wd', '--weight_decay', type=float, default=1e-3)    
+    parser.add_argument('-wd', '--weight_decay', type=float, default=1e-4)    
     args = parser.parse_args()
     train(args)
