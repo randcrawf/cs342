@@ -56,6 +56,8 @@ class CNNClassifier(torch.nn.Module):
             l.append(self.Block(c, layer, stride=2))
             c = layer
 
+        l.append(torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Linear(c, 10)
 
