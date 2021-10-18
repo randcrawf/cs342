@@ -27,11 +27,11 @@ def train(args):
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
     loss = ClassificationLoss()
 
-    train_trans = dense_transforms.Compose((dense_transforms.ToPILImage(), dense_transforms.ColorJitter(0.8, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.RandomCrop(32), dense_transforms.ToTensor())) # 96
-    val_trans = dense_transforms.Compose((dense_transforms.ToPILImage(), dense_transforms.CenterCrop(size=32), dense_transforms.ToTensor()))
+    train_trans = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.RandomCrop(96), dense_transforms.ToTensor())) # 96
+
     print("Loading data...")
     train_data = load_data('data/train', t=train_trans)
-    valid_data = load_data('data/valid', t=val_trans)
+    valid_data = load_data('data/valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
     global_step = 0
