@@ -27,6 +27,9 @@ class CNNClassifier(torch.nn.Module):
             self.net = torch.nn.Sequential(
                 torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
                 torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1),
+                torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU()
             )
             self.downsample = None
@@ -46,12 +49,12 @@ class CNNClassifier(torch.nn.Module):
         Hint: Base this on yours or HW2 master solution if you'd like.
         Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
         """
-        c = 128
-        l = [torch.nn.Conv2d(3, c, 3, padding=1), torch.nn.ReLU()]
-        strides = [1,2,1,2,1,2,1,2]
-        
-        for s in strides:
-            l.append(self.Block(c, c, stride=s))
+        c = 32
+        l = [torch.nn.Conv2d(3, c, 3, padding=1), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
+        layers = [32, 64, 128]
+        for layer in layers:
+            l.append(self.Block(c, layer, stride=2))
+            c = l
 
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Linear(c, 10)
@@ -78,6 +81,8 @@ class FCN(torch.nn.Module):
         Hint: Use residual connections
         Hint: Always pad by kernel_size / 2, use an odd kernel_size
         """
+        ks = 3
+
         raise NotImplementedError('FCN.__init__')
 
     def forward(self, x):
