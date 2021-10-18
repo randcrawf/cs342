@@ -27,6 +27,9 @@ class CNNClassifier(torch.nn.Module):
             self.net = torch.nn.Sequential(
                 torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1, bias=False),
                 torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1, bias=False),
+                torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU()
             )
             self.downsample = None
@@ -48,7 +51,7 @@ class CNNClassifier(torch.nn.Module):
         """
         c = 32
         l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2, bias=False), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
-        layers = [32, 64, 128]
+        layers = [32, 64, 128, 128]
         for layer in layers:
             l.append(self.Block(c, layer, stride=2))
             c = layer
