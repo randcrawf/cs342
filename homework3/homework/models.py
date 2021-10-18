@@ -3,6 +3,7 @@ import torch.nn.functional as F
 
 #Sources:
 #http://www.philkr.net/cs342/lectures/making_it_work/18.html (ResNets)
+#https://github.com/philkr/cat_vs_dog
 
 class ClassificationLoss(torch.nn.Module):
     def forward(self, input, target):
@@ -55,8 +56,6 @@ class CNNClassifier(torch.nn.Module):
         for layer in layers:
             l.append(self.Block(c, layer, stride=2))
             c = layer
-
-        l.append(torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Linear(c, 10)

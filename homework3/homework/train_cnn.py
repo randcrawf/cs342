@@ -4,6 +4,7 @@ import torch
 from torchvision import transforms
 import torch.utils.tensorboard as tb
 
+#https://github.com/philkr/cat_vs_dog (data augmentation)
 
 def train(args):
     from os import path
