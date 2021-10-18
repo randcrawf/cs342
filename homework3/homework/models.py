@@ -55,7 +55,7 @@ class CNNClassifier(torch.nn.Module):
         strides = [1,2,1,2,1,2,1,2]
 
         for s in strides:
-            l.append(self.Block(c, c, stride=s))
+            l.append(self.Block(c, c, stride=2))
 
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Linear(c, 10)
