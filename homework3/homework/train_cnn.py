@@ -25,7 +25,7 @@ def train(args):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = ClassificationLoss()
-    flip = transforms.Compose((transforms.RandomHorizontalFlip(), transforms.ToTensor()))
+    flip = transforms.Compose((transforms.RandomHorizontalFlip()))
     print("Loading data...")
     train_data = load_data('data/train', t=flip)
     valid_data = load_data('data/valid')
