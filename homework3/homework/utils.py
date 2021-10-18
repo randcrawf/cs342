@@ -46,7 +46,7 @@ class SuperTuxDataset(Dataset):
         Your code here
         """
         if self.transform is not None:
-            return self.transform(self.data[idx][0]), self.data[idx][1]
+            return self.t(self.data[idx][0]), self.data[idx][1]
         return self.data[idx][0], self.data[idx][1]
 
 
