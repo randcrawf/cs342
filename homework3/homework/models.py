@@ -54,7 +54,7 @@ class CNNClassifier(torch.nn.Module):
         layers = [32, 64, 128]
         for layer in layers:
             l.append(self.Block(c, layer, stride=2))
-            c = l
+            c = layer
 
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Linear(c, 10)
