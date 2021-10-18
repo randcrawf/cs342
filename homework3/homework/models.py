@@ -35,9 +35,9 @@ class CNNClassifier(torch.nn.Module):
 
         def forward(self, x):
             identity = x
-            if self.downsample is not None:
-                print("downsample")
-                identity = self.downsample(x)
+            # if self.downsample is not None:
+            #     print("downsample")
+            #     identity = self.downsample(x)
             return self.net(x) + identity
 
     def __init__(self):
