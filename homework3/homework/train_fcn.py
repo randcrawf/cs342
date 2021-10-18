@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from .models import FCN, save_model
+from .models import FCN, save_model, ClassificationLoss
 from .utils import load_dense_data, DENSE_CLASS_DISTRIBUTION, ConfusionMatrix
 from . import dense_transforms
 import torch.utils.tensorboard as tb
@@ -22,7 +22,54 @@ def train(args):
     Hint: If you found a good data augmentation parameters for the CNN, use them here too. Use dense_transforms
     Hint: Use the log function below to debug and visualize your model
     """
-    
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    model.to(device)
+    # if args.continue_training:
+    #     from os import path
+    #     model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), '%s.th' % args.model)))
+
+
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
+    loss = ClassificationLoss()
+    print("Loading data...")
+    train_data = load_dense_data('data_dense/train')
+    valid_data = load_dense_data('data_dense/valid')
+    torch.autograd.set_detect_anomaly(True)
+    loss.to(device)
+    global_step = 0
+    for epoch in range(args.num_epoch):
+        print("epoch #" + str(epoch))
+        print("Training...")
+        model.train()
+        loss_vals, acc_vals, vacc_vals = [], [], []
+        for im, label in train_data:
+            im, label= im.to(device), label.to(device)
+            pred = model(im)
+            loss_val = loss(pred, label)
+            acc_val = (model(im).argmax(1) == label).float().mean().item()
+
+            loss_vals.append(loss_val.detach().cpu().numpy())
+            acc_vals.append(acc_val)
+            optimizer.zero_grad()
+            loss_val.backward()
+            optimizer.step()
+            global_step += 1
+
+        avg_loss = sum(loss_vals) / len(loss_vals)
+        avg_acc = sum(acc_vals) / len(acc_vals)
+        train_logger.add_scalar('accuracy', avg_acc, global_step)
+        model.eval()
+        print("Validating...")
+        for img, label in valid_data:
+            img, label = img.to(device), label.to(device)
+            vacc_vals.append((model(img).argmax(1) == label).float().mean().item())
+            
+
+        avg_vacc = sum(vacc_vals) / len(vacc_vals)
+        valid_logger.add_scalar('accuracy', avg_vacc, global_step)
+        print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
+
+
     save_model(model)
 
 
