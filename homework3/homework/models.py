@@ -25,10 +25,10 @@ class CNNClassifier(torch.nn.Module):
         def __init__(self, n_input, n_output, stride=1):
             super().__init__()
             self.net = torch.nn.Sequential(
-                torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1, bias=False),
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU(),
-                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1, bias=False),
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU()
             )
@@ -50,7 +50,7 @@ class CNNClassifier(torch.nn.Module):
         Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
         """
         c = 32
-        l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
+        l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2, bias=False), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
         layers = [32, 64, 128]
         for layer in layers:
             l.append(self.Block(c, layer, stride=2))
