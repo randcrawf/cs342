@@ -38,8 +38,8 @@ class CNNClassifier(torch.nn.Module):
 
         def forward(self, x):
             identity = x
-            # if self.downsample is not None:
-            #     identity = self.downsample(x)
+            if self.downsample is not None:
+                identity = self.downsample(x)
             return self.net(x) + identity
 
     def __init__(self):
@@ -49,9 +49,9 @@ class CNNClassifier(torch.nn.Module):
         Hint: Base this on yours or HW2 master solution if you'd like.
         Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
         """
-        c = 32
+        c = 16
         l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
-        layers = [32, 64, 128]
+        layers = [16, 32, 64, 128]
         for layer in layers:
             l.append(self.Block(c, layer, stride=2))
             c = layer
