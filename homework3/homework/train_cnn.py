@@ -40,10 +40,10 @@ def train(args):
             im, label= im.to(device), label.to(device)
             pred = model(im)
             loss_val = loss(pred, label)
-            acc_val = (model(img).argmax(1) == label).float().mean().item()
+            acc_val = (model(im).argmax(1) == label).float().mean().item()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
-            acc_vals.append(acc_val.detach().cpu().numpy())
+            acc_vals.append(acc_val)
             optimizer.zero_grad()
             loss_val.backward()
             optimizer.step()
