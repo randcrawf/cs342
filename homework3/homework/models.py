@@ -32,15 +32,15 @@ class CNNClassifier(torch.nn.Module):
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU()
             )
-            self.downsample = None
-            if stride != 1 or n_input != n_output:
-                self.downsample = torch.nn.Sequential(torch.nn.Conv2d(n_input, n_output, 1, stride=stride), torch.nn.BatchNorm2d(n_output))
+            # self.downsample = None
+            # if stride != 1 or n_input != n_output:
+            #     self.downsample = torch.nn.Sequential(torch.nn.Conv2d(n_input, n_output, 1, stride=stride), torch.nn.BatchNorm2d(n_output))
 
         def forward(self, x):
-            identity = x
-            if self.downsample is not None:
-                identity = self.downsample(x)
-            return self.net(x) + identity
+            # identity = x
+            # if self.downsample is not None:
+            #     identity = self.downsample(x)
+            return self.net(x)# + identity
 
     def __init__(self):
         super().__init__()
