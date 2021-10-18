@@ -41,6 +41,7 @@ class CNNClassifier(torch.nn.Module):
             if self.downsample is not None:
                 print("downsample")
                 identity = self.downsample(x)
+            print(self.net(x).size(), identity.size())
             return self.net(x) + identity
 
     def __init__(self):
@@ -55,7 +56,7 @@ class CNNClassifier(torch.nn.Module):
         strides = [1,2,1,2,1,2,1,2]
 
         for s in strides:
-            l.append(self.Block(c, c, stride=2))
+            l.append(self.Block(c, c, stride=s))
 
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Linear(c, 10)
