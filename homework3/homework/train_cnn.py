@@ -1,7 +1,7 @@
 from .models import CNNClassifier, save_model, ClassificationLoss
 from .utils import ConfusionMatrix, load_data, LABEL_NAMES
 import torch
-import torchvision
+from torchvision import transforms
 import torch.utils.tensorboard as tb
 
 
@@ -23,11 +23,11 @@ def train(args):
     #     model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), '%s.th' % args.model)))
 
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = ClassificationLoss()
-    
+    ts = transforms.Compose((transforms.RandomHorizontalFlip(), transforms.RandomCrop(32), transforms.ToTensor()))
     print("Loading data...")
-    train_data = load_data('data/train')
+    train_data = load_data('data/train', ts)
     valid_data = load_data('data/valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
@@ -77,6 +77,6 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--num_epoch', type=int, default=50)
     parser.add_argument('-lr', '--learning_rate', type=float, default=1e-3)
     parser.add_argument('-mo', '--momentum', type=float, default=.9)
-
+    parser.add_argument('-wd', '--weight_decay', type=float, default=1e-3)    
     args = parser.parse_args()
     train(args)

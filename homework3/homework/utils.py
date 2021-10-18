@@ -33,6 +33,7 @@ class SuperTuxDataset(Dataset):
                     image = Image.open(path.join(dataset_path, fname))
                     label_id = LABEL_NAMES.index(label)
                     self.data.append((to_tensor(image), label_id))
+        self.t = t
 
     def __len__(self):
         """
@@ -44,6 +45,8 @@ class SuperTuxDataset(Dataset):
         """
         Your code here
         """
+        if self.t is not None:
+            return self.t(self.data[idx][0]), self.data[idx][1]
         return self.data[idx][0], self.data[idx][1]
 
 
