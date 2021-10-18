@@ -2,7 +2,6 @@ from .models import CNNClassifier, save_model, ClassificationLoss
 from .utils import ConfusionMatrix, load_data, LABEL_NAMES
 import torch
 import torchvision
-from . import dense_transforms
 import torch.utils.tensorboard as tb
 
 
@@ -26,11 +25,9 @@ def train(args):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
     loss = ClassificationLoss()
-
-    train_trans = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.RandomCrop(96), dense_transforms.ToTensor())) # 96
-
+    
     print("Loading data...")
-    train_data = load_data('data/train', t=train_trans)
+    train_data = load_data('data/train')
     valid_data = load_data('data/valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
