@@ -22,20 +22,29 @@ class SuperTuxDataset(Dataset):
         Hint: Do not store torch.Tensor's as data here, but use PIL images, torchvision.transforms expects PIL images
               for most transformations.
         """
-        raise NotImplementedError('SuperTuxDataset.__init__')
+        import csv
+        from os import path
+        self.data = []
+        to_tensor = transforms.ToTensor()
+        with open(path.join(dataset_path, 'labels.csv'), newline='') as f:
+            reader = csv.reader(f)
+            for fname, label, _ in reader:
+                if label in LABEL_NAMES:
+                    image = Image.open(path.join(dataset_path, fname))
+                    label_id = LABEL_NAMES.index(label)
+                    self.data.append((to_tensor(image), label_id))
 
     def __len__(self):
         """
         Your code here
         """
-        raise NotImplementedError('SuperTuxDataset.__len__')
+        return len(self.data)
 
     def __getitem__(self, idx):
         """
         Your code here
         """
-        raise NotImplementedError('SuperTuxDataset.__getitem__')
-        return img, label
+        return self.data[idx][0], self.data[idx][1]
 
 
 class DenseSuperTuxDataset(Dataset):
