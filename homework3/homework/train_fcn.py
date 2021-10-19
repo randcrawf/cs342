@@ -45,7 +45,7 @@ def train(args):
         for im, label in train_data:
             im, label= im.to(device), label.to(device)
             pred = model(im)
-            loss_val = loss(pred, label)
+            loss_val = loss(pred, label.long())
             acc_val = (model(im).argmax(1) == label).float().mean().item()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
