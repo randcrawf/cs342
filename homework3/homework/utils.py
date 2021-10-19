@@ -17,7 +17,7 @@ DENSE_CLASS_DISTRIBUTION = [0.52683655, 0.02929112, 0.4352989, 0.0044619, 0.0041
 
 
 class SuperTuxDataset(Dataset):
-    def __init__(self, dataset_path, t=None):
+    def __init__(self, dataset_path, mode='train'):
         """
         Your code here
         Hint: Use your solution (or the master solution) to HW1 / HW2
@@ -37,14 +37,17 @@ class SuperTuxDataset(Dataset):
                     image = Image.open(path.join(dataset_path, fname))
                     label_id = LABEL_NAMES.index(label)
                     self.data.append((to_tensor(image), label_id))
-        self.t = transforms.Compose([
-                    transforms.ToPILImage(),
-			        transforms.Scale(256),
-			        transforms.RandomCrop(224),
-                    transforms.RandomHorizontalFlip(),
-			        transforms.ToTensor(),
-			        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
-                ])
+
+
+        self.t = None
+        if mode == 'train':
+            self.t = transforms.Compose([
+                        transforms.ToPILImage(),
+                        transforms.RandomCrop(32),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.ToTensor(),
+                        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
+                    ])
 
     def __len__(self):
         """

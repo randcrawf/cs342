@@ -28,7 +28,7 @@ def train(args):
     loss = ClassificationLoss()
     print("Loading data...")
     train_data = load_data('data/train')
-    valid_data = load_data('data/valid')
+    valid_data = load_data('data/valid', mode='valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
     global_step = 0
