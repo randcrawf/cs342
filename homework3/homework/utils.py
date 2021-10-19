@@ -44,15 +44,15 @@ class SuperTuxDataset(Dataset):
             self.t = transforms.Compose([
                         transforms.ToPILImage(),
                         transforms.RandomRotation(degrees=(0, 180)),
-                        transforms.RandomCrop(32),
+                        transforms.ColorJitter(0.3, 0.3),
                         transforms.ToTensor()
                     ])
-        else:
-            self.t = transforms.Compose([
-                        transforms.ToPILImage(),
-                        transforms.Scale(32),
-                        transforms.ToTensor()
-                    ])
+        # else:
+        #     self.t = transforms.Compose([
+        #                 transforms.ToPILImage(),
+        #                 transforms.Scale(32),
+        #                 transforms.ToTensor()
+        #             ])
     def __len__(self):
         """
         Your code here
