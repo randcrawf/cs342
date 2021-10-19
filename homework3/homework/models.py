@@ -95,12 +95,6 @@ class FCN(torch.nn.Module):
           torch.nn.Conv2d(128, 256, kernel_size=7, stride=1, padding=3),
           torch.nn.BatchNorm2d(256),
           torch.nn.ReLU(),
-          torch.nn.Conv2d(256, 512, kernel_size=7, stride=1, padding=3),
-          torch.nn.BatchNorm2d(512),
-          torch.nn.ReLU(),
-          torch.nn.Conv2d(512, 256, kernel_size=1, stride=1),
-          torch.nn.BatchNorm2d(256),
-          torch.nn.ReLU(),
           torch.nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1),
           torch.nn.BatchNorm2d(128),
           torch.nn.ReLU(),
@@ -129,7 +123,7 @@ class FCN(torch.nn.Module):
               if required (use z = z[:, :, :H, :W], where H and W are the height and width of a corresponding strided
               convolution
         """
-        B, N, H, W = x.shape
+        _B, _N, H, W = x.shape
         z = self.net(x)[:,:,:H,:W]
         return z
 
