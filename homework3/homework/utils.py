@@ -8,6 +8,7 @@ from torchvision.transforms.transforms import RandomHorizontalFlip, ToPILImage
 from . import dense_transforms
 
 #https://github.com/philkr/cat_vs_dog (data augmentation)
+#https://www.programcreek.com/python/example/104838/torchvision.transforms.RandomCrop
 
 LABEL_NAMES = ['background', 'kart', 'pickup', 'nitro', 'bomb', 'projectile']
 DENSE_LABEL_NAMES = ['background', 'kart', 'track', 'bomb/projectile', 'pickup/nitro']
@@ -39,9 +40,9 @@ class SuperTuxDataset(Dataset):
         self.t = transforms.Compose([
                     transforms.ToPILImage(),
 			        transforms.Scale(256),
-			        transforms.CenterCrop(224),
+			        transforms.RandomCrop(224),
                     transforms.RandomHorizontalFlip(),
-			        transforms.ToTensor(), 
+			        transforms.ToTensor(),
 			        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
                 ])
 
