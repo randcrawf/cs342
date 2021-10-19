@@ -44,7 +44,7 @@ class SuperTuxDataset(Dataset):
             self.t = transforms.Compose([
                         transforms.ToPILImage(),
                         transforms.RandomHorizontalFlip(),
-                        transforms.RandomPerspective(distortion_scale=1, p=1.0),
+                        transforms.RandomPerspective(distortion_scale=.3),
                         # transforms.ColorJitter(0.3, 0.3),
                         transforms.ToTensor()
                     ])
