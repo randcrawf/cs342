@@ -32,7 +32,10 @@ def train(args):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = ClassificationLoss()
+    cm = ConfusionMatrix()
     t = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor()))
+    
+    
     print("Loading data...")
     train_data = load_dense_data('dense_data/train', transform=t)
     valid_data = load_dense_data('dense_data/valid')
@@ -48,7 +51,8 @@ def train(args):
             im, label= im.to(device), label.to(device)
             pred = model(im)
             loss_val = loss(pred, label.long())
-            acc_val = (model(im).argmax(1) == label).float().mean().item()
+            cm.add(pred.argmax(1), label)
+            acc_val = (pred.argmax(1) == label).float().mean().item()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
             acc_vals.append(acc_val)
@@ -69,7 +73,7 @@ def train(args):
 
         avg_vacc = sum(vacc_vals) / len(vacc_vals)
         valid_logger.add_scalar('accuracy', avg_vacc, global_step)
-        print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
+        print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f \t iou = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc, cm.iou))
 
 
     save_model(model)
