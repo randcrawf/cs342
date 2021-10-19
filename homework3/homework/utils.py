@@ -3,6 +3,7 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms import functional as F
+from torchvision.transforms.transforms import ToPILImage
 
 from . import dense_transforms
 
@@ -36,6 +37,7 @@ class SuperTuxDataset(Dataset):
                     label_id = LABEL_NAMES.index(label)
                     self.data.append((to_tensor(image), label_id))
         self.t = transforms.Compose([
+                    transforms.ToPILImage(),
 			        transforms.Scale(256),
 			        transforms.CenterCrop(224),
 			        transforms.ToTensor(), 
