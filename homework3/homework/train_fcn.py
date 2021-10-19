@@ -30,7 +30,7 @@ def train(args):
     #     model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), '%s.th' % args.model)))
 
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = ClassificationLoss()
     t = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.RandomCrop(96), dense_transforms.ToTensor()))
     print("Loading data...")
