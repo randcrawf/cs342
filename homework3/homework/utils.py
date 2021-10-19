@@ -43,8 +43,9 @@ class SuperTuxDataset(Dataset):
         if mode == 'train':
             self.t = transforms.Compose([
                         transforms.ToPILImage(),
-                        transforms.RandomRotation(degrees=(0, 180)),
-                        transforms.ColorJitter(0.3, 0.3),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.RandomPerspective(distortion_scale=0.6, p=1.0),
+                        # transforms.ColorJitter(0.3, 0.3),
                         transforms.ToTensor()
                     ])
         # else:
