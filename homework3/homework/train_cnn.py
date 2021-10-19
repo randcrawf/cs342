@@ -26,6 +26,8 @@ def train(args):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = ClassificationLoss()
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=2)
+
     print("Loading data...")
     train_data = load_data('data/train')
     valid_data = load_data('data/valid', mode='valid')
@@ -62,6 +64,7 @@ def train(args):
 
         avg_vacc = sum(vacc_vals) / len(vacc_vals)
         valid_logger.add_scalar('accuracy', avg_vacc, global_step)
+        scheduler.step(avg_vacc)
         print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
 
 
