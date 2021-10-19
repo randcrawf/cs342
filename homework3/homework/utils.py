@@ -54,7 +54,7 @@ class SuperTuxDataset(Dataset):
         #                 transforms.Scale(32),
         #                 transforms.ToTensor()
         #             ])
-        
+
     def __len__(self):
         """
         Your code here
@@ -96,8 +96,8 @@ def load_data(dataset_path, num_workers=0, batch_size=128, **kwargs):
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
-def load_dense_data(dataset_path, num_workers=0, batch_size=32, mode='train', model_type='fcn',**kwargs):
-    dataset = DenseSuperTuxDataset(dataset_path, mode=mode, model_type=model_type, **kwargs)
+def load_dense_data(dataset_path, num_workers=0, batch_size=32,**kwargs):
+    dataset = DenseSuperTuxDataset(dataset_path, **kwargs)
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
