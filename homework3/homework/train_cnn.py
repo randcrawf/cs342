@@ -65,7 +65,8 @@ def train(args):
         avg_vacc = sum(vacc_vals) / len(vacc_vals)
         valid_logger.add_scalar('accuracy', avg_vacc, global_step)
         scheduler.step(avg_vacc)
-        print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
+        currlr = optimizer.param_groups[0]['lr']
+        print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f \t lr = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc, currlr))
 
 
     save_model(model)
