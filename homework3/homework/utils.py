@@ -6,6 +6,8 @@ from torchvision.transforms import functional as F
 
 from . import dense_transforms
 
+#https://github.com/philkr/cat_vs_dog (data augmentation)
+
 LABEL_NAMES = ['background', 'kart', 'pickup', 'nitro', 'bomb', 'projectile']
 DENSE_LABEL_NAMES = ['background', 'kart', 'track', 'bomb/projectile', 'pickup/nitro']
 # Distribution of classes on dense training set (background and track dominate (96%)
