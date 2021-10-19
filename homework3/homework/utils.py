@@ -17,7 +17,7 @@ DENSE_CLASS_DISTRIBUTION = [0.52683655, 0.02929112, 0.4352989, 0.0044619, 0.0041
 
 
 class SuperTuxDataset(Dataset):
-    def __init__(self, dataset_path, mode='train', model_type='cnn'):
+    def __init__(self, dataset_path, mode='train'):
         """
         Your code here
         Hint: Use your solution (or the master solution) to HW1 / HW2
@@ -40,29 +40,21 @@ class SuperTuxDataset(Dataset):
 
 
         self.t = None
-
-        if model_type == 'cnn':
-            if mode == 'train':
-                self.t = transforms.Compose([
-                            transforms.ToPILImage(),
-                            transforms.RandomHorizontalFlip(),
-                            transforms.RandomPerspective(distortion_scale=.3),
-                            # transforms.ColorJitter(0.5, 0.3),
-                            transforms.ToTensor()
-                        ])
-            # else:
-            #     self.t = transforms.Compose([
-            #                 transforms.ToPILImage(),
-            #                 transforms.Scale(32),
-            #                 transforms.ToTensor()
-            #             ])
-        else:
-            if mode == 'train':
-                self.t = dense_transforms.Compose((
-                    dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), 
-                    dense_transforms.RandomHorizontalFlip(), 
-                    dense_transforms.RandomCrop(96), 
-                    dense_transforms.ToTensor()))
+        if mode == 'train':
+            self.t = transforms.Compose([
+                        transforms.ToPILImage(),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.RandomPerspective(distortion_scale=.3),
+                        # transforms.ColorJitter(0.5, 0.3),
+                        transforms.ToTensor()
+                    ])
+        # else:
+        #     self.t = transforms.Compose([
+        #                 transforms.ToPILImage(),
+        #                 transforms.Scale(32),
+        #                 transforms.ToTensor()
+        #             ])
+        
     def __len__(self):
         """
         Your code here

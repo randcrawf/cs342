@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from torchvision import transforms
 
 from .models import FCN, save_model, ClassificationLoss
 from .utils import load_dense_data, DENSE_CLASS_DISTRIBUTION, ConfusionMatrix
@@ -31,9 +32,10 @@ def train(args):
 
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
     loss = ClassificationLoss()
+    t = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.RandomCrop(96), dense_transforms.ToTensor()))
     print("Loading data...")
-    train_data = load_dense_data('dense_data/train', model_type='fcn')
-    valid_data = load_dense_data('dense_data/valid', model_type='fcn', mode='valid')
+    train_data = load_dense_data('dense_data/train', transforms=t)
+    valid_data = load_dense_data('dense_data/valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
     global_step = 0
