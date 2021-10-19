@@ -33,7 +33,7 @@ def train(args):
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = ClassificationLoss()
     cm = ConfusionMatrix()
-    t = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor()))
+    t = dense_transforms.Compose((dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor()))
     
     
     print("Loading data...")

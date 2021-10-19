@@ -48,12 +48,6 @@ class SuperTuxDataset(Dataset):
                         transforms.RandomPerspective(distortion_scale=.3),
                         transforms.ToTensor()
                     ])
-        # else:
-        #     self.t = transforms.Compose([
-        #                 transforms.ToPILImage(),
-        #                 transforms.Scale(32),
-        #                 transforms.ToTensor()
-        #             ])
 
     def __len__(self):
         """
