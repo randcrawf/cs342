@@ -43,17 +43,16 @@ class SuperTuxDataset(Dataset):
         if mode == 'train':
             self.t = transforms.Compose([
                         transforms.ToPILImage(),
-                        transforms.RandomHorizontalFlip(),
-                        transforms.RandomCrop(96),
+                        transforms.RandomRotation(degrees=(0, 180)),
+                        transforms.RandomCrop(32),
                         transforms.ToTensor()
                     ])
-        # else:
-        #     self.t = transforms.Compose([
-        #                 transforms.ToPILImage(),
-        #                 transforms.Scale(256),
-        #                 transforms.ToTensor(),
-        #                 transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
-        #             ])
+        else:
+            self.t = transforms.Compose([
+                        transforms.ToPILImage(),
+                        transforms.Scale(32),
+                        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
+                    ])
     def __len__(self):
         """
         Your code here
