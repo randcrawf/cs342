@@ -32,8 +32,8 @@ def train(args):
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
     loss = ClassificationLoss()
     print("Loading data...")
-    train_data = load_dense_data('data_dense/train')
-    valid_data = load_dense_data('data_dense/valid')
+    train_data = load_dense_data('dense_data/train')
+    valid_data = load_dense_data('dense_data/valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
     global_step = 0
