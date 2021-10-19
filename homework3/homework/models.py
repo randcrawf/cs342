@@ -129,7 +129,9 @@ class FCN(torch.nn.Module):
               if required (use z = z[:, :, :H, :W], where H and W are the height and width of a corresponding strided
               convolution
         """
-        return self.net(x)
+        B, N, H, W = x.shape
+        z = self.net(x)[:,:,:H,:W]
+        return z
 
 
 model_factory = {
