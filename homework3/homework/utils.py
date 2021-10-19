@@ -3,7 +3,7 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms import functional as F
-from torchvision.transforms.transforms import ToPILImage
+from torchvision.transforms.transforms import RandomHorizontalFlip, ToPILImage
 
 from . import dense_transforms
 
@@ -40,8 +40,8 @@ class SuperTuxDataset(Dataset):
                     transforms.ToPILImage(),
 			        transforms.Scale(256),
 			        transforms.CenterCrop(224),
-			        transforms.ToTensor(), 
-			        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
+                    transforms.RandomHorizontalFlip(),
+			        transforms.ToTensor()
                 ])
 
     def __len__(self):
