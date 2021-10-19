@@ -34,7 +34,7 @@ def train(args):
     loss = ClassificationLoss()
     t = dense_transforms.Compose((dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.RandomCrop(96), dense_transforms.ToTensor()))
     print("Loading data...")
-    train_data = load_dense_data('dense_data/train', transforms=t)
+    train_data = load_dense_data('dense_data/train', transform=t)
     valid_data = load_dense_data('dense_data/valid')
     torch.autograd.set_detect_anomaly(True)
     loss.to(device)
