@@ -109,7 +109,11 @@ class FCN(torch.nn.Module):
           torch.nn.BatchNorm2d(64),
           torch.nn.ReLU(),
           torch.nn.UpsamplingBilinear2d(scale_factor=2),
-          torch.nn.Conv2d(64, 5, kernel_size=3, stride=1, padding=1),
+          torch.nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1),
+          torch.nn.BatchNorm2d(32),
+          torch.nn.ReLU(),
+          torch.nn.UpsamplingBilinear2d(scale_factor=2),
+          torch.nn.Conv2d(32, 5, kernel_size=3, stride=1, padding=1),
           torch.nn.BatchNorm2d(5),
           torch.nn.ReLU()
         )
