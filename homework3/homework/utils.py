@@ -45,7 +45,7 @@ class SuperTuxDataset(Dataset):
                         transforms.ToPILImage(),
                         transforms.RandomHorizontalFlip(),
                         transforms.RandomPerspective(distortion_scale=.3),
-                        transforms.ColorJitter(0.5, 0.3),
+                        # transforms.ColorJitter(0.5, 0.3),
                         transforms.ToTensor()
                     ])
         # else:
