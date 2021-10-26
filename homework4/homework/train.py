@@ -36,10 +36,10 @@ def train(args):
             im, hm = im.to(device), hm.to(device)
             pred = model(im)
             loss_val = loss(pred, hm).mean()
-            acc_val = (pred.argmax(1) == hm).float().mean().item()
+            #acc_val = (pred.argmax(1) == hm).float().mean().item()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
-            acc_vals.append(acc_val)
+            #acc_vals.append(acc_val)
             optimizer.zero_grad()
             loss_val.backward()
             optimizer.step()
@@ -47,21 +47,20 @@ def train(args):
             log(train_logger, im, hm, pred, global_step)
 
         avg_loss = sum(loss_vals) / len(loss_vals)
-        avg_acc = sum(acc_vals) / len(acc_vals)
+        #avg_acc = sum(acc_vals) / len(acc_vals)
         model.eval()
         print("Validating...")
         for im, hm, _ in valid_data:
             im, hm = im.to(device), hm.to(device)
-            vacc_vals.append((model(im).argmax(1) == hm).float().mean().item())
+            #vacc_vals.append((model(im).argmax(1) == hm).float().mean().item())
             log(train_logger, im, hm, pred, global_step)
             
 
-        avg_vacc = sum(vacc_vals) / len(vacc_vals)
-        valid_logger.add_scalar('accuracy', avg_vacc, global_step)
-        print('epoch %-3d \t loss = %0.3f \t acc = %0.3f \t val acc = %0.3f \t iou = %0.3f' % (epoch, avg_loss, avg_acc, avg_vacc))
+        #avg_vacc = sum(vacc_vals) / len(vacc_vals)
+        print('epoch %-3d \t loss = %0.3f' % (epoch, avg_loss))
     save_model(model)
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    model = Detector().to(device)
+    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    # model = Detector().to(device)
 
     # """
     # Your code here, modify your HW3 code
