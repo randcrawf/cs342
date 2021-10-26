@@ -23,8 +23,8 @@ def train(args):
     model.to(device)
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = torch.nn.BCEWithLogitsLoss()
-    train_data = load_detection_data('dense_data/train')
-    valid_data = load_detection_data('dense_data/valid')
+    train_data = load_detection_data('dense_data/train', num_workers=4)
+    valid_data = load_detection_data('dense_data/valid', num_workers=4)
     loss.to(device)
     global_step = 0
     for epoch in range(args.num_epoch):
