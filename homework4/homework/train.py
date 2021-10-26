@@ -53,7 +53,7 @@ def train(args):
         for im, hm, _ in valid_data:
             im, hm = im.to(device), hm.to(device)
             #vacc_vals.append((model(im).argmax(1) == hm).float().mean().item())
-            log(train_logger, im, hm, pred, global_step)
+            log(valid_logger, im, hm, model(im), global_step)
             
 
         #avg_vacc = sum(vacc_vals) / len(vacc_vals)
