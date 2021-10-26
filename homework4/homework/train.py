@@ -97,7 +97,7 @@ def log(logger, imgs, gt_det, det, global_step):
     """
     logger.add_images('image', imgs[:16], global_step)
     logger.add_images('label', gt_det[:16], global_step)
-    logger.add_images('pred', torch.sigmoid(det[:16]), global_step)
+    logger.add_images('pred', det[:16], global_step)
 
 if __name__ == '__main__':
     import argparse
