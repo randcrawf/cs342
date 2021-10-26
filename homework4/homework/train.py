@@ -72,6 +72,7 @@ def train(args):
     train_data = load_detection_data('dense_data/train', num_workers=4)
 
     for epoch in range(50):
+        print(epoch)
         model.train()
         for image, heatmap, delta in train_data:
             image = image.to(device)
