@@ -74,7 +74,7 @@ def train(args):
     for epoch in range(50):
         print(epoch)
         model.train()
-        for image, heatmap, delta in train_data:
+        for image, heatmap in train_data:
             image = image.to(device)
             heatmap = heatmap.to(device)
 
