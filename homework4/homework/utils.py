@@ -4,7 +4,7 @@ from . import dense_transforms
 
 
 class DetectionSuperTuxDataset(Dataset):
-    def __init__(self, dataset_path, transform=dense_transforms.ToTensor(), min_size=20):
+    def __init__(self, dataset_path, transform=dense_transforms.Compose(dense_transforms.ToTensor(), dense_transforms.ToHeatmap()), min_size=20):
         from glob import glob
         from os import path
         self.files = []
