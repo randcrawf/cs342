@@ -203,6 +203,7 @@ class DetectionGrader(Grader):
     @Case(score=10)
     def test_box_ap0(self, min_val=0.5, max_val=0.75):
         """Average precision (inside box c=0)"""
+        print("here")
         ap = self.pr_box[0].average_prec
         return max(min(ap, max_val) - min_val, 0) / (max_val - min_val), 'AP = %0.3f' % ap
 
