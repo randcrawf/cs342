@@ -66,6 +66,7 @@ class Detector(torch.nn.Module):
         x = self.feature_extractor(x).mean(3).mean(2)
         print(x.size())
         print(self.classifier(x).size())
+        breakpoint
         return self.classifier(x)
 
     def detect(self, image):
