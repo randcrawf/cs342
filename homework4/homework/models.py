@@ -54,7 +54,7 @@ class Detector(torch.nn.Module):
             c = layer
 
         self.feature_extractor = torch.nn.Sequential(*l)
-        self.classifier = torch.nn.Linear(c, 6)
+        self.classifier = torch.nn.Conv2d(c, 3, 1)
 
     def forward(self, x):
         """
@@ -63,7 +63,7 @@ class Detector(torch.nn.Module):
            and detect for detection
         """
         print(x.size())
-        x = self.feature_extractor(x).mean(3).mean(2)
+        x = self.feature_extractor(x)
         print(x.size())
         print(self.classifier(x).size())
         breakpoint
