@@ -1,22 +1,6 @@
 import torch
 import torch.nn.functional as F
 
-class ClassificationLoss(torch.nn.Module):
-    def forward(self, input, target):
-        """
-        Your code here
-
-        Compute mean(-log(softmax(input)_label))
-
-        @input:  torch.Tensor((B,C))
-        @target: torch.Tensor((B,), dtype=torch.int64)
-
-        @return:  torch.Tensor((,))
-
-        Hint: Don't be too fancy, this is a one-liner
-        """
-        return F.cross_entropy(input, target)
-
 def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
     """
        Your code here.
@@ -39,7 +23,7 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
 
     return [*zip(peaks, indices[i] % heatmap.shape[1], indices[i] // heatmap.shape[1])]
 
-class CNNClassifier(torch.nn.Module):
+class Detector(torch.nn.Module):
     class Block(torch.nn.Module):
         def __init__(self, n_input, n_output, stride=1):
             super().__init__()
@@ -54,14 +38,14 @@ class CNNClassifier(torch.nn.Module):
             
         def forward(self, x):
             return self.net(x)
-
+    
     def __init__(self):
+        """
+           Your code here.
+           Setup your detection network
+        """
         super().__init__()
-        """
-        Your code here
-        Hint: Base this on yours or HW2 master solution if you'd like.
-        Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
-        """
+        
         c = 16
         l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2, bias=False), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
         layers = [32, 64, 128]
@@ -74,69 +58,12 @@ class CNNClassifier(torch.nn.Module):
 
     def forward(self, x):
         """
-        Your code here
-        @x: torch.Tensor((B,3,64,64))
-        @return: torch.Tensor((B,6))
-        Hint: Apply input normalization inside the network, to make sure it is applied in the grader
-        """
-        x = self.feature_extractor(x).mean(3).mean(2)
-        return self.classifier(x)
-
-
-class Detector(torch.nn.Module):
-    class UpBlock(torch.nn.Module):
-        def __init__(self, n_input, n_output, kernel_size=3, stride=2):
-            super().__init__()
-            self.c1 = torch.nn.ConvTranspose2d(n_input, n_output, kernel_size=kernel_size, padding=kernel_size // 2,
-                                      stride=stride, output_padding=1)
-
-        def forward(self, x):
-            return F.relu(self.c1(x))
-    
-    def __init__(self):
-        """
-           Your code here.
-           Setup your detection network
-        """
-        super().__init__()
-        self.input_mean = torch.Tensor([0.3521554, 0.30068502, 0.28527516])
-        self.input_std = torch.Tensor([0.18182722, 0.18656468, 0.15938024])
-        layers = [16, 32, 64, 128]
-        c = 3
-        self.use_skip = True
-        self.n_conv = len(layers)
-        skip_layer_size = [3] + layers[:-1]
-        for i, l in enumerate(layers):
-            self.add_module('conv%d' % i, CNNClassifier.Block(c, l, stride=2))
-            c = l
-        for i, l in list(enumerate(layers))[::-1]:
-            self.add_module('upconv%d' % i, self.UpBlock(c, l, kernel_size=3, stride=2))
-            c = l
-            if self.use_skip:
-                c += skip_layer_size[i]
-        self.classifier = torch.nn.Conv2d(c, 3, 1)
-
-    def forward(self, x):
-        """
            Your code here.
            Implement a forward pass through the network, use forward for training,
            and detect for detection
         """
-        z = (x - self.input_mean[None, :, None, None].to(x.device)) / self.input_std[None, :, None, None].to(x.device)
-        up_activation = []
-        for i in range(self.n_conv):
-            # Add all the information required for skip connections
-            up_activation.append(z)
-            z = self._modules['conv%d' % i](z)
-
-        for i in reversed(range(self.n_conv)):
-            z = self._modules['upconv%d' % i](z)
-            # Fix the padding
-            z = z[:, :, :up_activation[i].size(2), :up_activation[i].size(3)]
-            # Add the skip connection
-            if self.use_skip:
-                z = torch.cat([z, up_activation[i]], dim=1)
-        return self.classifier(z)
+        x = self.feature_extractor(x).mean(3).mean(2)
+        return self.classifier(x)
 
     def detect(self, image):
         """

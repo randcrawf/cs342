@@ -23,23 +23,21 @@ def train(args):
     model.to(device)
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = torch.nn.BCEWithLogitsLoss()
-    train_data = load_detection_data('dense_data/train', num_workers=4)
-    valid_data = load_detection_data('dense_data/valid', num_workers=4)
+    train_data = load_detection_data('dense_data/train', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
+    valid_data = load_detection_data('dense_data/valid', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     loss.to(device)
     global_step = 0
     for epoch in range(args.num_epoch):
         print("epoch #" + str(epoch))
         print("Training...")
         model.train()
-        loss_vals, acc_vals, vacc_vals = [], [], []
+        loss_vals = []
         for im, hm, _ in train_data:
             im, hm = im.to(device), hm.to(device)
             pred = model(im)
             loss_val = loss(pred, hm).mean()
-            #acc_val = (pred.argmax(1) == hm).float().mean().item()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
-            #acc_vals.append(acc_val)
             optimizer.zero_grad()
             loss_val.backward()
             optimizer.step()
@@ -47,16 +45,12 @@ def train(args):
             log(train_logger, im, hm, pred, global_step)
 
         avg_loss = sum(loss_vals) / len(loss_vals)
-        #avg_acc = sum(acc_vals) / len(acc_vals)
         model.eval()
         print("Validating...")
         for im, hm, _ in valid_data:
             im, hm = im.to(device), hm.to(device)
-            #vacc_vals.append((model(im).argmax(1) == hm).float().mean().item())
             log(valid_logger, im, hm, model(im), global_step)
             
-
-        #avg_vacc = sum(vacc_vals) / len(vacc_vals)
         print('epoch %-3d \t loss = %0.3f' % (epoch, avg_loss))
     save_model(model)
     # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')

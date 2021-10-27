@@ -33,7 +33,7 @@ class DetectionSuperTuxDataset(Dataset):
 
 
 def load_detection_data(dataset_path, num_workers=0, batch_size=32, **kwargs):
-    dataset = DetectionSuperTuxDataset(dataset_path, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]), **kwargs)
+    dataset = DetectionSuperTuxDataset(dataset_path, **kwargs)
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
