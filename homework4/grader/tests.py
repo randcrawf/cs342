@@ -38,15 +38,11 @@ class PR:
         self.is_close = is_close
 
     def add(self, d, lbl):
-        print("here5")
         lbl = torch.as_tensor(lbl.astype(float), dtype=torch.float32).view(-1, 4)
-        print("here6")
         d = torch.as_tensor(d, dtype=torch.float32).view(-1, 5)
         all_pair_is_close = self.is_close(d[:, 1:], lbl)
-        print("here7")
         # Get the box size and filter out small objects
         sz = abs(lbl[:, 2]-lbl[:, 0]) * abs(lbl[:, 3]-lbl[:, 1])
-        print("here8")
         # If we have detections find all true positives and count of the rest as false positives
         if len(d):
             detection_used = torch.zeros(len(d))
@@ -65,7 +61,6 @@ class PR:
             # All other detections are false positives
             for s in d[detection_used == 0, 0]:
                 self.det.append((float(s), 0))
-        print("here9")
         # Total number of detections, used to count false negatives
         self.total_det += int(torch.sum(sz >= self.min_size))
 
@@ -189,7 +184,6 @@ class DetectionGrader(Grader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         det = self.module.load_model().eval().to(device)
-        print("here1")
         # Compute detections
         self.pr_box = [PR() for _ in range(3)]
         self.pr_dist = [PR(is_close=point_close) for _ in range(3)]
@@ -198,13 +192,9 @@ class DetectionGrader(Grader):
             with torch.no_grad():
                 detections = det.detect(img.to(device))
                 for i, gt in enumerate(gts):
-                    print("here2", i)
                     self.pr_box[i].add(detections[i], gt)
-                    print("here4", i)
                     self.pr_dist[i].add(detections[i], gt)
-                    print("here5", i)
                     self.pr_iou[i].add(detections[i], gt)
-                    print("here3", i)
 
     @Case(score=10)
     def test_box_ap0(self, min_val=0.5, max_val=0.75):
