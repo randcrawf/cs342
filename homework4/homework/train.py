@@ -23,8 +23,8 @@ def train(args):
     model.to(device)
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     loss = torch.nn.BCEWithLogitsLoss()
-    train_data = load_detection_data('dense_data/train', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
-    valid_data = load_detection_data('dense_data/valid', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
+    train_data = load_detection_data('dense_data/train', num_workers=4)
+    valid_data = load_detection_data('dense_data/valid', num_workers=4)
     loss.to(device)
     global_step = 0
     for epoch in range(args.num_epoch):
@@ -32,25 +32,25 @@ def train(args):
         print("Training...")
         model.train()
         loss_vals = []
-        for im, hm, _ in train_data:
-            im, hm = im.to(device), hm.to(device)
+        for im, label in train_data:
+            im, label = im.to(device), label.to(device)
             pred = model(im)
-            print(pred.size(), hm.size(), im.size())
-            loss_val = loss(pred, hm).mean()
+            print(pred.size(), label.size(), im.size())
+            loss_val = loss(pred, label).mean()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
             optimizer.zero_grad()
             loss_val.backward()
             optimizer.step()
             global_step += 1
-            log(train_logger, im, hm, pred, global_step)
+            log(train_logger, im, label, pred, global_step)
 
         avg_loss = sum(loss_vals) / len(loss_vals)
         model.eval()
         print("Validating...")
-        for im, hm, _ in valid_data:
-            im, hm = im.to(device), hm.to(device)
-            log(valid_logger, im, hm, model(im), global_step)
+        for im, label, _ in valid_data:
+            im, label = im.to(device), label.to(device)
+            log(valid_logger, im, label, model(im), global_step)
             
         print('epoch %-3d \t loss = %0.3f' % (epoch, avg_loss))
     save_model(model)
