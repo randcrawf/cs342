@@ -45,7 +45,7 @@ class Detector(torch.nn.Module):
            Setup your detection network
         """
         super().__init__()
-        
+
         c = 16
         l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2, bias=False), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
         layers = [32, 64, 128]
@@ -54,7 +54,7 @@ class Detector(torch.nn.Module):
             c = layer
 
         self.feature_extractor = torch.nn.Sequential(*l)
-        self.classifier = torch.nn.Linear(c, 10)
+        self.classifier = torch.nn.Linear(c, 6)
 
     def forward(self, x):
         """
