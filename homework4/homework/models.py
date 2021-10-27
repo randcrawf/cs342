@@ -107,10 +107,10 @@ class Detector(torch.nn.Module):
         self.n_conv = len(layers)
         skip_layer_size = [3] + layers[:-1]
         for i, l in enumerate(layers):
-            self.add_module('conv%d' % i, CNNClassifier.Block(c, l, 3, stride=2))
+            self.add_module('conv%d' % i, CNNClassifier.Block(c, l, kernel_size=3, stride=2))
             c = l
         for i, l in list(enumerate(layers))[::-1]:
-            self.add_module('upconv%d' % i, self.UpBlock(c, l, 3, 2))
+            self.add_module('upconv%d' % i, self.UpBlock(c, l,  kernel_size=3, stride=2))
             c = l
             if self.use_skip:
                 c += skip_layer_size[i]
