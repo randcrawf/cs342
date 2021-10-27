@@ -200,6 +200,7 @@ class DetectionGrader(Grader):
                     self.pr_box[i].add(detections[i], gt)
                     self.pr_dist[i].add(detections[i], gt)
                     self.pr_iou[i].add(detections[i], gt)
+                    print("here3", i)
 
     @Case(score=10)
     def test_box_ap0(self, min_val=0.5, max_val=0.75):
