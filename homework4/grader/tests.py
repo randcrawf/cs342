@@ -187,7 +187,7 @@ class DetectionGrader(Grader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         det = self.module.load_model().eval().to(device)
-        print("here")
+        print("here1")
         # Compute detections
         self.pr_box = [PR() for _ in range(3)]
         self.pr_dist = [PR(is_close=point_close) for _ in range(3)]
@@ -196,6 +196,7 @@ class DetectionGrader(Grader):
             with torch.no_grad():
                 detections = det.detect(img.to(device))
                 for i, gt in enumerate(gts):
+                    print("here2", i)
                     self.pr_box[i].add(detections[i], gt)
                     self.pr_dist[i].add(detections[i], gt)
                     self.pr_iou[i].add(detections[i], gt)
