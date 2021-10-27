@@ -39,12 +39,13 @@ class PR:
 
     def add(self, d, lbl):
         lbl = torch.as_tensor(lbl.astype(float), dtype=torch.float32).view(-1, 4)
+        print("here6")
         d = torch.as_tensor(d, dtype=torch.float32).view(-1, 5)
         all_pair_is_close = self.is_close(d[:, 1:], lbl)
-
+        print("here7")
         # Get the box size and filter out small objects
         sz = abs(lbl[:, 2]-lbl[:, 0]) * abs(lbl[:, 3]-lbl[:, 1])
-
+        print("here8")
         # If we have detections find all true positives and count of the rest as false positives
         if len(d):
             detection_used = torch.zeros(len(d))
@@ -63,7 +64,7 @@ class PR:
             # All other detections are false positives
             for s in d[detection_used == 0, 0]:
                 self.det.append((float(s), 0))
-
+        print("here9")
         # Total number of detections, used to count false negatives
         self.total_det += int(torch.sum(sz >= self.min_size))
 
