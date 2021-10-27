@@ -62,7 +62,7 @@ class CNNClassifier(torch.nn.Module):
         Hint: Base this on yours or HW2 master solution if you'd like.
         Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
         """
-        c = 32
+        c = 16
         l = [torch.nn.Conv2d(3, c, kernel_size=7, padding=3, stride=2, bias=False), torch.nn.BatchNorm2d(c), torch.nn.ReLU(), torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
         layers = [32, 64, 128]
         for layer in layers:
@@ -101,13 +101,13 @@ class Detector(torch.nn.Module):
         super().__init__()
         self.input_mean = torch.Tensor([0.3521554, 0.30068502, 0.28527516])
         self.input_std = torch.Tensor([0.18182722, 0.18656468, 0.15938024])
-        layers = [32, 64, 128]
+        layers = [16, 32, 64, 128]
         c = 3
         self.use_skip = True
         self.n_conv = len(layers)
         skip_layer_size = [3] + layers[:-1]
         for i, l in enumerate(layers):
-            self.add_module('conv%d' % i, CNNClassifier.Block(c, l, stride=2))
+            self.add_module('conv%d' % i, CNNClassifier.Block(c, l, 3, stride=2))
             c = l
         for i, l in list(enumerate(layers))[::-1]:
             self.add_module('upconv%d' % i, self.UpBlock(c, l, 3, 2))
