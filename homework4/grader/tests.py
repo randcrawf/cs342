@@ -198,7 +198,9 @@ class DetectionGrader(Grader):
                 for i, gt in enumerate(gts):
                     print("here2", i)
                     self.pr_box[i].add(detections[i], gt)
+                    print("here4", i)
                     self.pr_dist[i].add(detections[i], gt)
+                    print("here5", i)
                     self.pr_iou[i].add(detections[i], gt)
                     print("here3", i)
 
