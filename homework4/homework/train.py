@@ -21,8 +21,8 @@ def train(args):
     """
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
-    loss = torch.nn.BCEWithLogitsLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+    loss = torch.nn.BCEWithLogitsLoss(reduction='none')
     train_data = load_detection_data('dense_data/train', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     valid_data = load_detection_data('dense_data/valid', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     loss.to(device)
@@ -92,7 +92,7 @@ def log(logger, imgs, gt_det, det, global_step):
     """
     logger.add_images('image', imgs[:16], global_step)
     logger.add_images('label', gt_det[:16], global_step)
-    logger.add_images('pred', det[:16], global_step)
+    logger.add_images('pred', torch.sigmoid(det[:16]), global_step)
 
 if __name__ == '__main__':
     import argparse
