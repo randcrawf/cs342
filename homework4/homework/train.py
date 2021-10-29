@@ -22,7 +22,7 @@ def train(args):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
-    loss = torch.nn.BCEWithLogitsLoss(reduction='none')
+    loss = torch.nn.BCEWithLogitsLoss()
     train_data = load_detection_data('dense_data/train', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     valid_data = load_detection_data('dense_data/valid', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     loss.to(device)
