@@ -23,8 +23,8 @@ def train(args):
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     loss = torch.nn.BCEWithLogitsLoss()
-    train_data = load_detection_data('dense_data/train', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
-    valid_data = load_detection_data('dense_data/valid', num_workers=4, transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
+    train_data = load_detection_data('dense_data/train', transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
+    valid_data = load_detection_data('dense_data/valid', transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     loss.to(device)
     global_step = 0
     for epoch in range(args.num_epoch):
@@ -35,7 +35,7 @@ def train(args):
         for im, hm, _ in train_data:
             im, hm = im.to(device), hm.to(device)
             pred = model(im)
-            #print(pred.size(), hm.size(), im.size())
+            print(pred.size(), hm.size(), im.size())
             loss_val = loss(pred, hm).mean()
 
             loss_vals.append(loss_val.detach().cpu().numpy())
@@ -54,32 +54,6 @@ def train(args):
             
         print('epoch %-3d \t loss = %0.3f' % (epoch, avg_loss))
     save_model(model)
-    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    # model = Detector().to(device)
-
-    # """
-    # Your code here, modify your HW3 code
-    # """
-    # loss = torch.nn.BCEWithLogitsLoss(reduction='none').to(device)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=1e-6)
-
-    # train_data = load_detection_data('dense_data/train', num_workers=4)
-
-    # for epoch in range(50):
-    #     print(epoch)
-    #     model.train()
-    #     for image, heatmap, _ in train_data:
-    #         image = image.to(device)
-    #         heatmap = heatmap.to(device)
-
-    #         pred_heatmap = model(image)
-
-    #         l = loss(pred_heatmap, heatmap).mean()
-    #         l.backward()
-    #         optimizer.step()
-    #         optimizer.zero_grad()
-    #     model.eval()
-    # save_model(model)
 
 
 def log(logger, imgs, gt_det, det, global_step):
