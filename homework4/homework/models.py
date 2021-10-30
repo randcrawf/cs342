@@ -45,10 +45,11 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
 
     is_peak = (heatmap >= local_maxs).float()
     
-    mask = torch.logical_and(local_maxs > min_score, is_peak == 1.0)
-    #mask = []
-    x = torch.Tensor(1,1,mask.size(2), mask.size(3))
-    print(x.size())
+    #mask = torch.logical_and(local_maxs > min_score, is_peak == 1.0)
+    mask = torch.Tensor(1, 1, heatmap.size(2), heatmap.size(3))
+    for i in range(heatmap.size(2)):
+        for j in range(heatmap.size(3)):
+            mask(0,0,i,j) = local_maxs(0,0,i,j) > min_score and is_peak(0,0,i,j) == 1.0
     local_maxs = local_maxs[mask]
     indices = indices[mask]
     peaks, inds = torch.topk(local_maxs, min(max_det, len(local_maxs)))
