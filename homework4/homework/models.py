@@ -49,7 +49,7 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
     max_cls = max_cls[mask]
     indices = indices[mask]
     # print(max_cls, indices, mask.size())
-    peaks, inds = torch.topk(max_cls, max_det)
+    peaks, inds = torch.topk(max_cls, min(max_det, len(max_cls)))
     # print("i", inds)
     # print(peaks)
     #print(len([*zip(peaks, indices[i] % heatmap.shape[1], indices[i] // heatmap.shape[1])]))
