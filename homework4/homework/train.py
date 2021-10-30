@@ -42,14 +42,14 @@ def train(args):
             loss_val.backward()
             optimizer.step()
             global_step += 1
-            log(train_logger, im, hm, pred, global_step)
+            #log(train_logger, im, hm, pred, global_step)
 
         avg_loss = sum(loss_vals) / len(loss_vals)
         model.eval()
         print("Validating...")
         for im, hm, _ in valid_data:
             im, hm = im.to(device), hm.to(device)
-            log(valid_logger, im, hm, model(im), global_step)
+            #log(valid_logger, im, hm, model(im), global_step)
             
         print('epoch %-3d \t loss = %0.3f' % (epoch, avg_loss))
     save_model(model)
