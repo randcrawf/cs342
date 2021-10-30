@@ -43,9 +43,8 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
 
     max_cls, indices = F.max_pool2d(heatmap[None, None], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
 
-    # tip: visualize is_peak and heatmap side by side.
     is_peak = (heatmap >= max_cls).float()
-
+    print(is_peak)
     mask = torch.logical_and(max_cls > min_score, is_peak == 1.0)
     max_cls = max_cls[mask]
     indices = indices[mask]
