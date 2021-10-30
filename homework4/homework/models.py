@@ -29,17 +29,29 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
     #             return peaks
             
     # return peaks
-    localMaxs = F.max_pool2d(heatmap[None, None], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1)
+    # localMaxs = F.max_pool2d(heatmap[None, None], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1)
 
-    peaks = []
-    for i in range(localMaxs.size(2)):
-        for j in range(localMaxs.size(3)):
-            if localMaxs[0, 0, i, j] == heatmap[i, j] and heatmap[i, j] > min_score:
-                peaks.append((heatmap[i, j], j, i))
-                if len(peaks) == max_det:
-                    return peaks
+    # peaks = []
+    # for i in range(localMaxs.size(2)):
+    #     for j in range(localMaxs.size(3)):
+    #         if localMaxs[0, 0, i, j] == heatmap[i, j] and heatmap[i, j] > min_score:
+    #             peaks.append((heatmap[i, j], j, i))
+    #             if len(peaks) == max_det:
+    #                 return peaks
 
-    return peaks
+    # return peaks
+
+    max_cls, indices = F.max_pool2d(heatmap[None, None], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
+
+    # tip: visualize is_peak and heatmap side by side.
+    is_peak = (heatmap >= max_cls).float()
+
+    mask = torch.logical_and(max_cls > min_score, is_peak == 1.0)
+    max_cls = max_cls[mask]
+    indices = indices[mask]
+    peaks, i = torch.topk(max_cls, min(max_det, len(max_cls)))
+
+    return [*zip(peaks, indices[i] % heatmap.shape[1], indices[i] // heatmap.shape[1])]
     
 
 
