@@ -35,8 +35,6 @@ def train(args):
         for im, hm, _ in train_data:
             im, hm = im.to(device), hm.to(device)
             pred = model(im)
-            print(pred.size(), hm.size(), im.size())
-            breakpoint
             loss_val = loss(pred, hm).mean()
 
             loss_vals.append(loss_val.detach().cpu().numpy())

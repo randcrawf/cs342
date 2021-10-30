@@ -80,10 +80,7 @@ class Detector(torch.nn.Module):
            Implement a forward pass through the network, use forward for training,
            and detect for detection
         """
-        print("83", x.size())
         x = self.feature_extractor(x)
-        print("85", x.size())
-        print("86", self.classifier(x).size())
         return self.classifier(x)
 
     def detect(self, image):
