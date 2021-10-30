@@ -11,25 +11,23 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
        @return: List of peaks [(score, cx, cy), ...], where cx, cy are the position of a peak and score is the
                 heatmap value at the peak. Return no more than max_det peaks per image
     """
+    def isMax(heatmap, max_pool_ks, i, j):
+        for r in range(max(0, i - (max_pool_ks // 2)), min(heatmap.size(0), i + max_pool_ks // 2)):
+            for c in range(max(0, j - (max_pool_ks // 2)), min(heatmap.size(1), j + max_pool_ks // 2)):
+                if heatmap[i, j] < heatmap[i + r, j + c]:
+                    return False
+        
+        return True
+    
     peaks = []
-    # print("hm", heatmap)
     for i in range(heatmap.size(0)):
         for j in range(heatmap.size(1)):
-            isGreatest = True
-            for r in range(-1 * (max_pool_ks // 2), max_pool_ks // 2):
-                if i + r > 0 and i + r < heatmap.size(0):
-                    for c in range(-1 * (max_pool_ks // 2), max_pool_ks // 2):
-                        if j + c > 0 and j + c < heatmap.size(1) and heatmap[i, j] < heatmap[i + r, j + c]:
-                            isGreatest = False
-
-            if isGreatest and float(heatmap[i, j]) > min_score:
+            if isMax(heatmap, max_pool_ks, i, j) and float(heatmap[i, j]) > min_score:
                 peaks.append((heatmap[i, j], j, i))
 
             if len(peaks) == max_det:
-                # print(peaks)
                 return peaks
             
-    # print(peaks)
     return peaks
 
 class Detector(torch.nn.Module):
@@ -104,7 +102,11 @@ class Detector(torch.nn.Module):
                  scalar. Otherwise pytorch might keep a computation graph in the background and your program will run
                  out of memory.
         """
-        return [[(*peak, 0, 0) for peak in extract_peak(heatmap, max_pool_ks=11, max_det=15)] for heatmap in self(image[None]).squeeze(0)]
+        res = []
+        for heatmap in self(image[None]).squeeze(0):
+            for s, cx, cy in extract_peak(heatmap, max_pool_ks=11, max_det=15):
+                res.append(s, cx, cy, 0, 0)
+        return res
 
 
 def save_model(model):
