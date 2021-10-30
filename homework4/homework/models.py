@@ -128,12 +128,10 @@ class Detector(torch.nn.Module):
                  out of memory.
         """
         res = []
-        i = 0
-        for heatmap in self(image[None]).squeeze(0):
-            print(i)
-            i += 1
+        hms = self(image[None])
+        for hm in hms:
             peaks = []
-            for s, cx, cy in extract_peak(heatmap, max_pool_ks=7, max_det=25):
+            for s, cx, cy in extract_peak(hm, max_pool_ks=7, max_det=25):
                 peaks.append((s, cx, cy, 0, 0))
             res.append(peaks)
 
