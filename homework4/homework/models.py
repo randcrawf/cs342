@@ -27,7 +27,7 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
                             isGreatest = False
 
             if isGreatest and float(heatmap[i, j]) > min_score:
-                peaks.append((float(heatmap[i, j]), i, j))
+                peaks.append((heatmap[i, j], tensor(i), tensor(j)))
             
     print(peaks)
     return peaks
