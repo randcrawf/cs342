@@ -11,17 +11,20 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
        @return: List of peaks [(score, cx, cy), ...], where cx, cy are the position of a peak and score is the
                 heatmap value at the peak. Return no more than max_det peaks per image
     """
-    max_cls, indices = F.max_pool2d(heatmap[None, None], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
+    peaks = []
+    for i in range(heatmap.size(1)):
+        for j in range(heatmap.size(2)):
+            isGreatest = True
+            for r in range(-max_pool_ks // 2, max_pool_ks // 2):
+                if i + r > 0 and i + r < heatmap.size(1):
+                    for c in range(-max_pool_ks // 2, max_pool_ks // 2):
+                        if j + c > 0 and j + c < heatmap.size(2) and heatmap[i, j] < heatmap[i + r, j + c]:
+                            isGreatest = False
 
-    # tip: visualize is_peak and heatmap side by side.
-    is_peak = (heatmap >= max_cls).float()
-
-    mask = torch.logical_and(max_cls > min_score, is_peak == 1.0)
-    max_cls = max_cls[mask]
-    indices = indices[mask]
-    peaks, i = torch.topk(max_cls, min(max_det, len(max_cls)))
-
-    return [*zip(peaks, indices[i] % heatmap.shape[1], indices[i] // heatmap.shape[1])]
+            if isGreatest:
+                peaks.append((heatmap[i, j], i, j))
+            
+    return peaks
 
 class Detector(torch.nn.Module):
     class UpBlock(torch.nn.Module):
@@ -33,7 +36,6 @@ class Detector(torch.nn.Module):
                 torch.nn.ReLU(),
                 torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1, bias=False),
                 torch.nn.BatchNorm2d(n_output),
-                #torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
                 torch.nn.ReLU()
             )
             
