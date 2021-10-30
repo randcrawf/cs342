@@ -188,13 +188,17 @@ class DetectionGrader(Grader):
         self.pr_box = [PR() for _ in range(3)]
         self.pr_dist = [PR(is_close=point_close) for _ in range(3)]
         self.pr_iou = [PR(is_close=box_iou) for _ in range(3)]
+        i = 0
         for img, *gts in self.module.utils.DetectionSuperTuxDataset('dense_data/valid', min_size=0):
+            print(i)
             with torch.no_grad():
                 detections = det.detect(img.to(device))
                 for i, gt in enumerate(gts):
                     self.pr_box[i].add(detections[i], gt)
                     self.pr_dist[i].add(detections[i], gt)
                     self.pr_iou[i].add(detections[i], gt)
+            
+            i += 1
 
     @Case(score=10)
     def test_box_ap0(self, min_val=0.5, max_val=0.75):
