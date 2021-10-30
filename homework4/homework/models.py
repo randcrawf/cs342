@@ -12,11 +12,11 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
                 heatmap value at the peak. Return no more than max_det peaks per image
     """
     peaks = []
-    print("hm", heatmap)
+    # print("hm", heatmap)
     for i in range(heatmap.size(0)):
         for j in range(heatmap.size(1)):
             if len(peaks) >= max_det:
-                print(peaks)
+                # print(peaks)
                 return peaks
             
             isGreatest = True
@@ -29,7 +29,7 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
             if isGreatest and float(heatmap[i, j]) > min_score:
                 peaks.append((heatmap[i, j], j, i))
             
-    print(peaks)
+    # print(peaks)
     return peaks
 
 class Detector(torch.nn.Module):
