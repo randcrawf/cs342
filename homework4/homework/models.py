@@ -14,7 +14,7 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
     peaks = []
     for i in range(heatmap.size(0)):
         for j in range(heatmap.size(1)):
-            if len(peaks) > max_det:
+            if len(peaks) >= max_det:
                 return peaks
             
             isGreatest = True
