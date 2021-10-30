@@ -24,7 +24,7 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
     return [*zip(peaks, indices[i] % heatmap.shape[1], indices[i] // heatmap.shape[1])]
 
 class Detector(torch.nn.Module):
-    class Block(torch.nn.Module):
+    class UpBlock(torch.nn.Module):
         def __init__(self, n_input, n_output, stride=1):
             super().__init__()
             self.net = torch.nn.Sequential(
@@ -40,6 +40,18 @@ class Detector(torch.nn.Module):
         def forward(self, x):
             return self.net(x)
     
+    class DownBlock(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.net = torch.nn.Sequential(
+                torch.nn.ConvTranspose2d(n_input, n_output, kernel_size=3, padding=1, stride=stride, output_padding=1),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU()
+            )
+            
+        def forward(self, x):
+            return self.net(x)
+
     def __init__(self):
         """
            Your code here.
@@ -51,9 +63,14 @@ class Detector(torch.nn.Module):
         l = []
         layers = [16, 32, 64, 128]
         for layer in layers:
-            l.append(self.Block(c, layer, stride=2))
+            l.append(self.UpBlock(c, layer, stride=2))
             c = layer
 
+        layers = [128, 64, 32, 16]
+        for layer in layers:
+            l.append(self.DownBlock(c, layer, stride=2))
+            c = layer
+        
         self.feature_extractor = torch.nn.Sequential(*l)
         self.classifier = torch.nn.Conv2d(c, 3, 1)
 
