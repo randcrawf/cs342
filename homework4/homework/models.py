@@ -129,6 +129,7 @@ class Detector(torch.nn.Module):
         """
         res = []
         hms = self(image[None])
+        print(hms.size())
         for i in range(hms.size(0)):
             print(i)
             peaks = []
