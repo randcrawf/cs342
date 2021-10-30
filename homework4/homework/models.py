@@ -41,15 +41,16 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
 
     # return peaks
 
-    max_cls, indices = F.max_pool2d(heatmap[None, None, :, :], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
+    local_maxs, indices = F.max_pool2d(heatmap[None, None, :, :], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
 
-    is_peak = (heatmap >= max_cls).float()
+    is_peak = (heatmap >= local_maxs).float()
     
-    mask = torch.logical_and(max_cls > min_score, is_peak == 1.0)
-    print(mask)
-    max_cls = max_cls[mask]
+    mask = torch.logical_and(local_maxs > min_score, is_peak == 1.0)
+    #mask = []
+    print(mask.size())
+    local_maxs = local_maxs[mask]
     indices = indices[mask]
-    peaks, inds = torch.topk(max_cls, min(max_det, len(max_cls)))
+    peaks, inds = torch.topk(local_maxs, min(max_det, len(local_maxs)))
     return [(peaks[i], indices[inds[i]] % heatmap.size(1), indices[inds[i]] // heatmap.size(1)) for i in range(peaks.size(0))]
     
 
