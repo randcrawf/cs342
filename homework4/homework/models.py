@@ -25,13 +25,13 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
 
 class Detector(torch.nn.Module):
     class Block(torch.nn.Module):
-        def __init__(self, n_input, n_output, stride=1):
+        def __init__(self, n_input, n_output, stride=1, output_padding=0):
             super().__init__()
             self.net = torch.nn.Sequential(
                 torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1, bias=False),
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU(),
-                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1, bias=False),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1, output_padding=output_padding, bias=False),
                 torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU()
             )
@@ -67,7 +67,7 @@ class Detector(torch.nn.Module):
 
         layers = [128, 64, 32, 16]
         for layer in layers:
-            l.append(self.Block(c, layer, stride=2))
+            l.append(self.Block(c, layer, stride=2, output_padding=1))
             c = layer
         
         self.feature_extractor = torch.nn.Sequential(*l)
