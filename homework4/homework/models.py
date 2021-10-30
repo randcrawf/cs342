@@ -108,8 +108,7 @@ class Detector(torch.nn.Module):
             for s, cx, cy in extract_peak(heatmap, max_pool_ks=11, max_det=15):
                 peaks.append((s, cx, cy, 0, 0))
             res.append(peaks)
-        print([[(*peak, 0, 0) for peak in extract_peak(heatmap, max_pool_ks=11, max_det=15)] for heatmap in self(image[None]).squeeze(0)])
-        print(res)
+
         return res
 
 
