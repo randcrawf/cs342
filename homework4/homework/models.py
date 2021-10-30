@@ -130,6 +130,7 @@ class Detector(torch.nn.Module):
         res = []
         hms = self(image[None])
         for i in range(hms.size(0)):
+            print(i)
             peaks = []
             for s, cx, cy in extract_peak(hms[i], max_pool_ks=7, max_det=25):
                 peaks.append((s, cx, cy, 0, 0))
