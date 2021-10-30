@@ -128,7 +128,7 @@ class Detector(torch.nn.Module):
                  out of memory.
         """
         res = []
-        for i in range(len(image.size(0))):
+        for i in range(image.size(0)):
             print("im: ", i)
             peaks = []
             for s, cx, cy in extract_peak(image[i], max_pool_ks=7, max_det=25):
