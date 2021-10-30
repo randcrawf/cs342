@@ -12,9 +12,9 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
                 heatmap value at the peak. Return no more than max_det peaks per image
     """
     def isMax(heatmap, max_pool_ks, i, j):
-        for r in range(max(0, i - (max_pool_ks // 2)), min(max_pool_ks, i + max_pool_ks // 2)):
-            for c in range(max(0, j - (max_pool_ks // 2)), min(max_pool_ks, j + max_pool_ks // 2)):
-                if heatmap[i, j] < heatmap[i + r, j + c]:
+        for r in range(max(0, i - (max_pool_ks // 2)), min(heatmap.size(0), i + max_pool_ks // 2)):
+            for c in range(max(0, j - (max_pool_ks // 2)), min(heatmap.size(1), j + max_pool_ks // 2)):
+                if heatmap[i, j] < heatmap[r, c]:
                     return False
         
         return True
