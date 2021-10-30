@@ -129,9 +129,9 @@ class Detector(torch.nn.Module):
         """
         res = []
         hms = self(image[None])
-        for hm in hms:
+        for i in range(hms.size(0)):
             peaks = []
-            for s, cx, cy in extract_peak(hm, max_pool_ks=7, max_det=25):
+            for s, cx, cy in extract_peak(hms[i], max_pool_ks=7, max_det=25):
                 peaks.append((s, cx, cy, 0, 0))
             res.append(peaks)
 
