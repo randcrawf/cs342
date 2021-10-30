@@ -128,7 +128,7 @@ class Detector(torch.nn.Module):
                  out of memory.
         """
         res = []
-        hms = self(image[None])
+        hms = self(image)
         print(hms.size())
         for i in range(hms.size(1)):
             peaks = []
