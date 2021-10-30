@@ -21,10 +21,10 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
                         if j + c > 0 and j + c < heatmap.size(1) and heatmap[i, j] < heatmap[i + r, j + c]:
                             isGreatest = False
 
-            if isGreatest:
+            if isGreatest and heatmap[i, j] > min_score:
                 peaks.append((heatmap[i, j], i, j))
             
-    return peaks
+    return peaks[:max_det]
 
 class Detector(torch.nn.Module):
     class UpBlock(torch.nn.Module):
