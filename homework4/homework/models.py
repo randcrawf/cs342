@@ -12,25 +12,15 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
                 heatmap value at the peak. Return no more than max_det peaks per image
     """
 
-    local_maxs, indices = F.max_pool2d(heatmap[None, None, :, :], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
+    local_maxs, max_indices = F.max_pool2d(heatmap[None, None, :, :], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
     
-    mask = torch.logical_and(local_maxs > min_score, heatmap == local_maxs)
-    # local_maxs = local_maxs[mask]
-    # indices = indices[mask]
-    local_maxs_arr = []
-    indices_arr = []
-    print(mask[0, 0, 0, 0])
-    for i in range(mask.size(2)):
-        for j in range(mask.size(3)):
-            # print(i, j, type(i), type(j))
-            if mask[0, 0, i, j]:
-                local_maxs_arr.append(int(local_maxs[0, 0, i, j]))
-                indices_arr.append(int(indices_arr[0, 0, i, j]))
-    print("x")
-    indices = [[index % heatmap.size(1), index // heatmap.size(1)] for index in indices]
+    peaks = torch.logical_and(local_maxs > min_score, heatmap == local_maxs)
+    local_maxs = local_maxs[peaks]
+    max_indices = max_indices[peaks]
+    max_indices = [[index % heatmap.size(1), index // heatmap.size(1)] for index in max_indices]
     print("xx")
     largest_peaks, inds = torch.topk(local_maxs, min(max_det, len(local_maxs)))
-    return [(largest_peaks[i], indices[inds[i]][0], indices[inds[i]][1]) for i in range(largest_peaks.size(0))]
+    return [(largest_peaks[i], max_indices[inds[i]][0], max_indices[inds[i]][1]) for i in range(largest_peaks.size(0))]
     
 
 
