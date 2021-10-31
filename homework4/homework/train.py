@@ -32,7 +32,7 @@ def train(args):
         print("Training...")
         model.train()
         loss_vals = []
-        for im, hm, _ in (train_data if epoch % 2 == 0 else valid_data):
+        for im, hm, _ in train_data:
             im, hm = im.to(device), hm.to(device)
             pred = model(im)
             loss_val = loss(pred, hm).mean()
