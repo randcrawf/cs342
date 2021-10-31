@@ -68,12 +68,12 @@ class Detector(torch.nn.Module):
 
         c = 3
         l = []
-        layers = [16, 32, 64, 128]
+        layers = [16, 32, 64]
         for layer in layers:
             l.append(self.Block(c, layer, stride=2))
             c = layer
 
-        layers = [128, 64, 32, 16]
+        layers = [64, 32, 16]
         for layer in layers:
             l.append(self.DownBlock(c, layer, stride=2))
             c = layer
