@@ -129,7 +129,7 @@ class Detector(torch.nn.Module):
         for i in range(hms.size(1)):
             peaks = []
             for s, cx, cy in extract_peak(hms[0, i], max_pool_ks=7, max_det=25):
-                peaks.append((s, cx, cy, 0, 0))
+                peaks.append((s, cx, cy, 0.0, 0.0))
             res.append(peaks)
 
         return res
