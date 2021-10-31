@@ -11,35 +11,6 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
        @return: List of peaks [(score, cx, cy), ...], where cx, cy are the position of a peak and score is the
                 heatmap value at the peak. Return no more than max_det peaks per image
     """
-    # def isMax(heatmap, max_pool_ks, i, j):
-    #     for r in range(max(0, i - (max_pool_ks // 2)), min(heatmap.size(0), i + max_pool_ks // 2)):
-    #         for c in range(max(0, j - (max_pool_ks // 2)), min(heatmap.size(1), j + max_pool_ks // 2)):
-    #             if heatmap[i, j] < heatmap[r, c]:
-    #                 return False
-        
-    #     return True
-    
-    # peaks = []
-    # for i in range(heatmap.size(0)):
-    #     for j in range(heatmap.size(1)):
-    #         if isMax(heatmap, max_pool_ks, i, j) and float(heatmap[i, j]) > min_score:
-    #             peaks.append((heatmap[i, j], j, i))
-
-    #         if len(peaks) == max_det:
-    #             return peaks
-            
-    # return peaks
-    # localMaxs = F.max_pool2d(heatmap[None, None], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1)
-
-    # peaks = []
-    # for i in range(localMaxs.size(2)):
-    #     for j in range(localMaxs.size(3)):
-    #         if localMaxs[0, 0, i, j] == heatmap[i, j] and heatmap[i, j] > min_score:
-    #             peaks.append((heatmap[i, j], j, i))
-    #             if len(peaks) == max_det:
-    #                 return peaks
-
-    # return peaks
 
     local_maxs, indices = F.max_pool2d(heatmap[None, None, :, :], kernel_size=max_pool_ks, padding=max_pool_ks // 2, stride=1, return_indices=True)
     
@@ -47,8 +18,8 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
     local_maxs = local_maxs[mask]
     indices = indices[mask]
     indices = [[index % heatmap.size(1), index // heatmap.size(1)] for index in indices]
-    peaks, inds = torch.topk(local_maxs, min(max_det, len(local_maxs)))
-    return [(peaks[i], indices[inds[i]][0], indices[inds[i]][1]) for i in range(peaks.size(0))]
+    largest_peaks, inds = torch.topk(local_maxs, min(max_det, len(local_maxs)))
+    return [(largest_peaks[i], indices[inds[i]][0], indices[inds[i]][1]) for i in range(largest_peaks.size(0))]
     
 
 
