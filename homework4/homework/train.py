@@ -24,7 +24,7 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     loss = torch.nn.BCEWithLogitsLoss()
     train_data = load_detection_data('dense_data/train', transform=dense_transforms.Compose([dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
-    valid_data = load_detection_data('dense_data/valid', transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
+    valid_data = load_detection_data('dense_data/valid', transform=dense_transforms.Compose([dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     loss.to(device)
     global_step = 0
     for epoch in range(args.num_epoch):
@@ -32,7 +32,7 @@ def train(args):
         print("Training...")
         model.train()
         loss_vals = []
-        for im, hm, _ in train_data:
+        for im, hm, _ in (train_data if epoch % 2 == 0 else valid_data):
             im, hm = im.to(device), hm.to(device)
             pred = model(im)
             loss_val = loss(pred, hm).mean()
@@ -46,9 +46,9 @@ def train(args):
 
         avg_loss = sum(loss_vals) / len(loss_vals)
         model.eval()
-        print("Validating...")
-        for im, hm, _ in valid_data:
-            im, hm = im.to(device), hm.to(device)
+        # print("Validating...")
+        # for im, hm, _ in valid_data:
+        #     im, hm = im.to(device), hm.to(device)
             #log(valid_logger, im, hm, model(im), global_step)
             
         print('epoch %-3d \t loss = %0.3f' % (epoch, avg_loss))
