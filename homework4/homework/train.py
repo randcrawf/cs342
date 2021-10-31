@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir')
-    parser.add_argument('-n', '--num_epoch', type=int, default=20)
+    parser.add_argument('-n', '--num_epoch', type=int, default=25)
     parser.add_argument('-lr', '--learning_rate', type=float, default=5e-3)
     parser.add_argument('-mo', '--momentum', type=float, default=.9)
     parser.add_argument('-wd', '--weight_decay', type=float, default=1e-6)  
