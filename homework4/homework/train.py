@@ -23,7 +23,7 @@ def train(args):
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     loss = torch.nn.BCEWithLogitsLoss()
-    train_data = load_detection_data('dense_data/train', transform=dense_transforms.Compose([dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor(), dense_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]), dense_transforms.ToHeatmap()]))
+    train_data = load_detection_data('dense_data/train', transform=dense_transforms.Compose([dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3), dense_transforms.RandomHorizontalFlip(), dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     valid_data = load_detection_data('dense_data/valid', transform=dense_transforms.Compose([dense_transforms.ToTensor(), dense_transforms.ToHeatmap()]))
     loss.to(device)
     global_step = 0
