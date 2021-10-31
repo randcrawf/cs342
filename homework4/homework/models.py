@@ -24,8 +24,8 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
         for j in range(mask.size(3)):
             # print(i, j, type(i), type(j))
             if mask[0, 0, i, j]:
-                local_maxs_arr.append(local_maxs[0, 0, i, j])
-                indices_arr.append(indices_arr[0, 0, i, j])
+                local_maxs_arr.append(int(local_maxs[0, 0, i, j]))
+                indices_arr.append(int(indices_arr[0, 0, i, j]))
     print("x")
     indices = [[index % heatmap.size(1), index // heatmap.size(1)] for index in indices]
     print("xx")
