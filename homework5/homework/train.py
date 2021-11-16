@@ -22,7 +22,7 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-5)
     loss = torch.nn.L1Loss().to(device)
 
-    transform = dense_transforms.Compose([dense_transforms.ColorJitter(.9, .9, .9, .1),
+    transform = dense_transforms.Compose([dense_transforms.ColorJitter(.9, .9, .9, .1),dense_transforms.RandomHorizontalFlip(),
         dense_transforms.ToTensor()])
         
     train_data = load_data('drive_data',transform=transform, num_workers=4)
@@ -31,11 +31,10 @@ def train(args):
         print("epoch: ", epoch)
         model.train()
 
-        for img, label in train_data:
+        for im, label in train_data:
+            im, label = im.to(device), label.to(device)
 
-            img, label = img.to(device), label.to(device)
-
-            logit = model(img)
+            logit = model(im)
             loss_val = loss(logit, label)
             optimizer.zero_grad()
             loss_val.backward()
@@ -69,7 +68,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--log_dir')
     parser.add_argument('-n', '--num_epoch', type=int, default=50)
-    parser.add_argument('-lr', '--learning_rate', type=float, default=1e-2)
+    parser.add_argument('-lr', '--learning_rate', type=float, default=5e-3)
     parser.add_argument('-mo', '--momentum', type=float, default=.9)
     parser.add_argument('-wd', '--weight_decay', type=float, default=1e-5) 
 
