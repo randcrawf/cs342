@@ -23,17 +23,15 @@ class Planner(torch.nn.Module):
                 torch.nn.ReLU(),
                 torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1),
                 torch.nn.BatchNorm2d(n_output),
-                torch.nn.ReLU(),
-                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1),
-                torch.nn.BatchNorm2d(n_output),
                 torch.nn.ReLU()
             )
             self.skip = torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride)
         def forward(self, x):
             return self.net(x) + self.skip(x)
 
-    def __init__(self, n_output_channels=2):
+    def __init__(self):
         super().__init__()
+        output_channels=2
         layers=[16, 32, 64, 128]
         L = []
         c = 3
@@ -41,7 +39,7 @@ class Planner(torch.nn.Module):
             L.append(self.Block(c, l, 2))
             c = l
         self.feature_extractor = torch.nn.Sequential(*L)
-        self.classifier = torch.nn.Linear(c, n_output_channels)
+        self.classifier = torch.nn.Linear(c, output_channels)
 
     def forward(self, x):
         x = self.feature_extractor(x).mean(3).mean(2)
