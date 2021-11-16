@@ -30,8 +30,7 @@ class Planner(torch.nn.Module):
             )
             self.skip = torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride)
         def forward(self, x):
-            x = self.net(x)
-            return x + self.skip(x)
+            return self.net(x)
 
     def __init__(self, layers=[16, 32, 64, 128], n_output_channels=2):
         super().__init__()
