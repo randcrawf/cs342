@@ -18,6 +18,19 @@ def control(aim_point, current_vel):
     Hint: You may want to use action.drift=True for wide turns (it will turn faster)
     """
 
+    angle = aim_point[0]
+    if abs(angle) > .36:
+        action.drift = True
+    
+    if current_vel > 20:
+        action.brake = True
+        action.acceleration = 0
+    else:
+        action.acceleration = 1
+        action.brake = False
+
+    action.steer = min(1, angle * 1.2) if angle > 0 else max(-1, angle * 1.2)
+
     return action
 
 
