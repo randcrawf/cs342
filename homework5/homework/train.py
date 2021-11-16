@@ -22,7 +22,7 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-5)
     loss = torch.nn.L1Loss().to(device)
 
-    transform = dense_transforms.Compose([dense_transforms.ColorJitter(.9, .9, .9, .1),dense_transforms.RandomHorizontalFlip(),
+    transform = dense_transforms.Compose([dense_transforms.ColorJitter(0.3, 0.3, 0.3, 0.3),dense_transforms.RandomHorizontalFlip(),
         dense_transforms.ToTensor()])
         
     train_data = load_data('drive_data',transform=transform, num_workers=4)
