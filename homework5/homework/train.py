@@ -27,7 +27,6 @@ def train(args):
         
     train_data = load_data('drive_data',transform=transform, num_workers=4)
 
-    global_step = 0
     for epoch in range(args.num_epoch):
         print("epoch: ", epoch)
         model.train()
