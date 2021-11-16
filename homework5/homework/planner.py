@@ -31,20 +31,18 @@ class Planner(torch.nn.Module):
 
     def __init__(self, layers=[16, 32, 64, 128], n_output_channels=2, kernel_size=3):
         super().__init__()
-        self.input_mean = torch.Tensor([0.3521554, 0.30068502, 0.28527516])
-        self.input_std = torch.Tensor([0.18182722, 0.18656468, 0.15938024])
 
         L = []
         c = 3
         for l in layers:
             L.append(self.Block(c, l, kernel_size, 2))
             c = l
-        self.network = torch.nn.Sequential(*L)
+        self.feature_extractor = torch.nn.Sequential(*L)
         self.classifier = torch.nn.Linear(c, n_output_channels)
 
     def forward(self, x):
-        z = self.network((x - self.input_mean[None, :, None, None].to(x.device)) / self.input_std[None, :, None, None].to(x.device))
-        return self.classifier(z.mean(dim=[2, 3]))
+        x = self.feature_extractor(x).mean(3).mean(2)
+        return self.classifier(x)
 
 
 def save_model(model):
