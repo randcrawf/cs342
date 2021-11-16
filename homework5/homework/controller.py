@@ -29,7 +29,7 @@ def control(aim_point, current_vel):
         action.acceleration = 1
         action.brake = False
 
-    action.steer = min(1, angle * 1.2) if angle > 0 else max(-1, angle * 1.2)
+    action.steer = min(1, angle * 1.23) if angle > 0 else max(-1, angle * 1.23)
 
     return action
 
