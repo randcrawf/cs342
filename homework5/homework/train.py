@@ -70,7 +70,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--log_dir')
-    # Put custom arguments here
+    parser.add_argument('-n', '--num_epoch', type=int, default=75)
+    parser.add_argument('-lr', '--learning_rate', type=float, default=1e-2)
+    parser.add_argument('-c', '--continue_training', action='store_true')
 
     args = parser.parse_args()
     train(args)
