@@ -7,7 +7,6 @@ from . import dense_transforms
 
 def train(args):
     from os import path
-    model = Planner()
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'))
@@ -21,7 +20,7 @@ def train(args):
     model = Planner().to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-5)
-    loss = torch.nn.L1Loss().to(device)
+    loss = torch.nn.BCEWithLogitsLoss()
 
     transform = dense_transforms.Compose([dense_transforms.ColorJitter(.9, .9, .9, .1),
         dense_transforms.ToTensor()])
