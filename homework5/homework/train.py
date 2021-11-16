@@ -20,7 +20,7 @@ def train(args):
     model = Planner().to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-5)
-    loss = torch.nn.BCEWithLogitsLoss()
+    loss = torch.nn.L1Loss().to(device)
 
     transform = dense_transforms.Compose([dense_transforms.ColorJitter(.9, .9, .9, .1),
         dense_transforms.ToTensor()])
