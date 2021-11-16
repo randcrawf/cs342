@@ -35,7 +35,7 @@ class Planner(torch.nn.Module):
         L = []
         c = 3
         for l in layers:
-            L.append(self.Block(c, l, kernel_size, 2))
+            L.append(self.Block(c, l, 2))
             c = l
         self.feature_extractor = torch.nn.Sequential(*L)
         self.classifier = torch.nn.Linear(c, n_output_channels)
