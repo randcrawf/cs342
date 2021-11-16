@@ -185,7 +185,7 @@ if __name__ == '__main__':
     for track in args.track:
         n, images_per_track = 0, args.n_images // len(args.track)
         aim_noise, vel_noise = 0, 0
-
+        print(track)
 
         def collect(_, im, pt):
             from PIL import Image
