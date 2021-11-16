@@ -16,8 +16,35 @@ def train(args):
     Your code here, modify your HW4 code
     Hint: Use the log function below to debug and visualize your model
     """
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    save_model(model)
+    model = Planner().to(device)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=1e-5)
+    loss = torch.nn.L1Loss().to(device)
+
+    transform = dense_transforms.Compose([dense_transforms.ColorJitter(.9, .9, .9, .1),
+        dense_transforms.ToTensor()])
+        
+    train_data = load_data('drive_data',transform=transform, num_workers=4)
+
+    global_step = 0
+    for epoch in range(args.num_epoch):
+        print("epoch: ", epoch)
+        model.train()
+
+        for img, label in train_data:
+
+            img, label = img.to(device), label.to(device)
+
+            logit = model(img)
+            loss_val = loss(logit, label)
+            optimizer.zero_grad()
+            loss_val.backward()
+            optimizer.step() 
+
+
+        save_model(model)
 
 def log(logger, img, label, pred, global_step):
     """
