@@ -107,7 +107,7 @@ class TCN(torch.nn.Module, LanguageModel):
             in_channels = char if i == 0 else layers[i - 1]
             out_channels = layers[i]
             L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=dropout)]
-            dilation_size *= 2
+            dilation_size = 2 ** i
 
         self.network = torch.nn.Sequential(*L)
 
@@ -136,7 +136,7 @@ class TCN(torch.nn.Module, LanguageModel):
             return self.softmax(stack_param(self.first, x))
 
         output = self.classifier(self.network(x))
-        batch = stack_param(self.first, x)
+        batch = stack_param(self.first_char, x)
         output = torch.cat([batch, output], dim=2)
         return output
 

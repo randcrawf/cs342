@@ -119,7 +119,7 @@ class LanguageGrader(Grader):
         # check(self.bigram, 10, -7.5, False)
         # check(self.bigram, 10, -1.5, True)
         # check(self.dummy, 10, -12., False)
-        check(self.dummy, 10, -0.4, True)
+        # check(self.dummy, 10, -0.4, True)
         # check(self.dummy, 2, -0.8, False)
         check(self.dummy, 2, -0.1, True)
 
