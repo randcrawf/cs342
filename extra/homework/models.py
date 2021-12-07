@@ -134,7 +134,8 @@ class TCN(torch.nn.Module, LanguageModel):
             return torch.nn.LogSoftmax(batch, dim=1)
 
         out = self.classifier(self.network(x))
-        return torch.cat([batch, out], dim=2)
+        out = torch.cat([batch, out], dim=2)
+        return out
 
     def predict_all(self, some_text):
         """
