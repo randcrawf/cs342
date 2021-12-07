@@ -133,7 +133,7 @@ class TCN(torch.nn.Module, LanguageModel):
             return batch
 
         if (x.shape[2] == 0):
-            return self.softmax(stack_param(self.first, x))
+            return self.softmax(stack_param(self.first_char, x))
 
         output = self.classifier(self.network(x))
         batch = stack_param(self.first_char, x)
@@ -148,10 +148,8 @@ class TCN(torch.nn.Module, LanguageModel):
         @return torch.Tensor((vocab_size, len(some_text)+1)) of log-likelihoods (not logits!)
         """
         one_hot = utils.one_hot(some_text)
-        forward_output = self.forward(one_hot[None])
-        prob = self.softmax(forward_output)
-        forward_output = prob.view(one_hot.shape[0], one_hot.shape[1] + 1)
-        return forward_output
+        prob = self.softmax(self.forward(one_hot[:]))
+        return prob.view(one_hot.shape[0], one_hot.shape[1] + 1)
 
 
 def save_model(model):

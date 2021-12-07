@@ -111,14 +111,14 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
                 c = utils.vocab[j]
                 ll = log_likelihood(model, s + c)
                 if c == ".":
-                    complete_sentences.add(ll / (len(s) + 1 if average_log_likelihood else 1), s + c)
+                    complete_sentences.add((ll / (len(s) + 1) if average_log_likelihood else 1), s + c)
                 else:
                     topN.add(ll, s + c)
         count += 1
 
     for _val, s in topN.elements:
         ll = log_likelihood(model, s + ".")
-        complete_sentences.add(ll / (len(s) + 1 if average_log_likelihood else 1), s + ".")
+        complete_sentences.add(ll / ((len(s) + 1) if average_log_likelihood else 1), s + ".")
     
     res = ["" for _ in range(n_results)]
     for i in range(len(complete_sentences.elements)):
