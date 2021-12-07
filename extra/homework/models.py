@@ -72,21 +72,16 @@ class TCN(torch.nn.Module, LanguageModel):
             :param dilation: Conv1d parameter
             """
             super().__init__()
-            self.pad1 = torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0)
-            self.c1 = torch.nn.utils.weight_norm(
-                torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation))
-            self.relu1 = torch.nn.ReLU()
-            self.dropout1 = torch.nn.Dropout(dropout)
-
-            self.c2 = torch.nn.utils.weight_norm(torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation))
-
-            self.pad2 = torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0)
-            self.relu2 = torch.nn.ReLU()
-            self.dropout2 = torch.nn.Dropout(dropout)
-
-            self.net = torch.nn.Sequential(self.pad1,self.c1, self.relu1, self.dropout1,
-                                            self.pad2,self.c2, self.relu2, self.dropout2)
-
+            self.net = torch.nn.Sequential(
+                torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
+                torch.nn.utils.weight_norm(torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation)),
+                torch.nn.ReLU(),
+                # torch.nn.Dropout(dropout),
+                torch.nn.utils.weight_norm(torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation)),
+                torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
+                torch.nn.ReLU(),
+                # torch.nn.Dropout(dropout),
+            )
             self.downsample = torch.nn.Conv1d(in_channels, out_channels, 1)
             self.relu = torch.nn.ReLU()
 
@@ -112,7 +107,7 @@ class TCN(torch.nn.Module, LanguageModel):
             in_channels = char if i == 0 else layers[i - 1]
             out_channels = layers[i]
             L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=dropout)]
-            dilation_size = 2 ** i
+            dilation_size *= 2
 
         self.network = torch.nn.Sequential(*L)
 
@@ -120,7 +115,7 @@ class TCN(torch.nn.Module, LanguageModel):
 
         self.softmax = torch.nn.LogSoftmax(dim=1)
 
-        self.first = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
+        self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
 
     def forward(self, x):
         """
