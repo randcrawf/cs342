@@ -61,7 +61,7 @@ class AdjacentLanguageModel(LanguageModel):
 
 class TCN(torch.nn.Module, LanguageModel):
     class CausalConv1dBlock(torch.nn.Module):
-        def __init__(self, in_channels, out_channels, kernel_size, dilation, dropout):
+        def __init__(self, in_channels, out_channels, kernel_size, dilation, dropout, downsample=True):
             """
             Your code here.
             Implement a Causal convolution followed by a non-linearity (e.g. ReLU).
@@ -74,21 +74,21 @@ class TCN(torch.nn.Module, LanguageModel):
             super().__init__()
             self.net = torch.nn.Sequential(
                 torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
-                torch.nn.utils.weight_norm(torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation)),
+                torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation),
                 torch.nn.ReLU(),
                 torch.nn.Dropout(dropout),
-                torch.nn.utils.weight_norm(torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation)),
+                torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation),
                 torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
                 torch.nn.ReLU(),
                 torch.nn.Dropout(dropout),
             )
-            self.downsample = torch.nn.Conv1d(in_channels, out_channels, 1)
+            self.down = torch.nn.Conv1d(in_channels, out_channels, 1) if downsample else None
 
         def forward(self, x):
             out = self.net(x)
-            return out + (x if self.downsample is None else self.downsample(x))
+            return out + (x if self.down is None else self.down(x))
 
-    def __init__(self, char=28, layers=[50]*8, kernel_size=3, dropout=0.05):
+    def __init__(self, layers=[50]*8, kernel_size=3):
         """
         Your code here
 
@@ -97,23 +97,22 @@ class TCN(torch.nn.Module, LanguageModel):
         use torch.nn.Parameter to explicitly create it.
         """
         super().__init__()
+        self.softmax = torch.nn.LogSoftmax(dim=1)
+
         L = []
-        out_channels = 28
+        out_channels = 50
         in_channels = 28
         dilation_size = 1
-        for i in len(layers):
-            out_channels = layers[i]
-            L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=dropout)]
+        downsample = True
+        for i in range(len(layers)):
+            L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=0.05, downsample=True)]
+            downsample = not downsample
             dilation_size = 2 ** i
             in_channels = layers[i]
 
+
         self.network = torch.nn.Sequential(*L)
-
         self.classifier = torch.nn.Conv1d(out_channels, 28, 1)
-
-        self.softmax = torch.nn.LogSoftmax(dim=1)
-
-        self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
 
     def forward(self, x):
         """
@@ -130,8 +129,10 @@ class TCN(torch.nn.Module, LanguageModel):
             batch = torch.stack(stacks, dim=0)
             return batch
 
+        
+        self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
         if (x.shape[2] == 0):
-            return self.softmax(stack_param(self.first_char, x))
+            return torch.nn.LogSoftmax(stack_param(self.first_char, x), dim=1)
 
         output = self.classifier(self.network(x))
         batch = stack_param(self.first_char, x)

@@ -53,7 +53,7 @@ def train(args):
         global_step += 1
         
         avg_loss = sum(loss_vals) / len(loss_vals)
-        train_logger.add_scalar('loss', avg_loss, global_step)
+        # train_logger.add_scalar('loss', avg_loss, global_step)
 
         model.eval()
         print("Validating...")
@@ -65,7 +65,7 @@ def train(args):
 
         valid_loss_vals.append(valid_loss_val.detach().cpu().numpy())
         avg_valid_loss = sum(valid_loss_vals) / len(valid_loss_vals)
-        valid_logger.add_scalar('loss', avg_valid_loss, global_step)
+        # valid_logger.add_scalar('loss', avg_valid_loss, global_step)
         print('epoch %-3d \t loss = %0.3f \t val loss = %0.3f' % (epoch, avg_loss, avg_valid_loss))
         save_model(model)
 
