@@ -76,11 +76,11 @@ class TCN(torch.nn.Module, LanguageModel):
                 torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
                 torch.nn.utils.weight_norm(torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation)),
                 torch.nn.ReLU(),
-                # torch.nn.Dropout(dropout),
+                torch.nn.Dropout(dropout),
                 torch.nn.utils.weight_norm(torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation)),
                 torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
                 torch.nn.ReLU(),
-                # torch.nn.Dropout(dropout),
+                torch.nn.Dropout(dropout),
             )
             self.downsample = torch.nn.Conv1d(in_channels, out_channels, 1)
             self.relu = torch.nn.ReLU()
