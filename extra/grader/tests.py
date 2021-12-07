@@ -111,6 +111,8 @@ class LanguageGrader(Grader):
             samples = bs(m, 100, n, max_length=30, average_log_likelihood=average_log_likelihood)
             assert len(samples) == n, "Beam search returned %d samples expected %d!"%(len(samples), n)
             assert all([s not in samples[:i] for i, s in enumerate(samples)]), 'Beam search returned duplicates'
+            print(samples)
+            print(ll(m, samples[5]))
             med_ll = np.median([float(ll(m, s))*(1./len(s) if average_log_likelihood else 1.) for s in samples])
             assert med_ll > min_log_likelihood, "Beam search failed to find high likelihood samples"
 
