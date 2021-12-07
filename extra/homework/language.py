@@ -161,7 +161,7 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
     for i in range(len(results.elements)):
         val, s = results.elements[i]
         res[i] = s
-    print(results.elements)
+    print(topN.elements)
 
     return res
         
