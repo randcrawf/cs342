@@ -101,7 +101,7 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
             topN.add(log_likelihood(model, c), c)
 
     count = 1
-    while count < max_length:
+    while count < max_length - 1:
         print(count)
         prev_beam = topN.elements.copy()
         topN = TopNHeap(beam_size)
@@ -111,7 +111,7 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
                 c = utils.vocab[j]
                 ll = log_likelihood(model, s + c)
                 if c == ".":
-                    complete_sentences.add((ll / (len(s) + 1) if average_log_likelihood else 1), s + c)
+                    complete_sentences.add(ll / ((len(s) + 1) if average_log_likelihood else 1), s + c)
                 else:
                     topN.add(ll, s + c)
         count += 1

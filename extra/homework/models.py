@@ -124,7 +124,6 @@ class TCN(torch.nn.Module, LanguageModel):
         @return torch.Tensor((B, vocab_size, L+1)) a batch of log-likelihoods or logits
         """
 
-        
         stacks = []
         for _ in range(x.shape[0]):
             stacks.append(self.first_char)
