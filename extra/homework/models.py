@@ -122,22 +122,18 @@ class TCN(torch.nn.Module, LanguageModel):
         @x: torch.Tensor((B, vocab_size, L)) a batch of one-hot encodings
         @return torch.Tensor((B, vocab_size, L+1)) a batch of log-likelihoods or logits
         """
-        def stack_param(param, input):
-            stacks = []
-            for i in range(input.shape[0]):
-                stacks.append(param)
-            batch = torch.stack(stacks, dim=0)
-            return batch
 
-        
         self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
-        if (x.shape[2] == 0):
-            return torch.nn.LogSoftmax(stack_param(self.first_char, x), dim=1)
+        
+        stacks = []
+        for _ in range(x.shape[0]):
+            stacks.append(self.first_char)
+        batch = torch.stack(stacks, dim=0)
 
-        output = self.classifier(self.network(x))
-        batch = stack_param(self.first_char, x)
-        output = torch.cat([batch, output], dim=2)
-        return output
+        if (x.shape[2] == 0):
+            return torch.nn.LogSoftmax(batch, dim=1)
+
+        return torch.cat([batch, self.classifier(self.network(x))], dim=2)
 
     def predict_all(self, some_text):
         """
@@ -147,8 +143,8 @@ class TCN(torch.nn.Module, LanguageModel):
         @return torch.Tensor((vocab_size, len(some_text)+1)) of log-likelihoods (not logits!)
         """
         one_hot = utils.one_hot(some_text)
-        prob = self.softmax(self.forward(one_hot[:]))
-        return prob.view(one_hot.shape[0], one_hot.shape[1] + 1)
+        p = self.softmax(self.forward(one_hot[:]))
+        return p.view(one_hot.size(0), one_hot.size(1) + 1)
 
 
 def save_model(model):
