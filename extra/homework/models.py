@@ -132,8 +132,8 @@ class TCN(torch.nn.Module, LanguageModel):
 
         if (x.shape[2] == 0):
             return torch.nn.LogSoftmax(batch, dim=1)
-
-        return torch.cat([batch, self.classifier(self.network(x))], dim=2)
+        netx = self.network(x)
+        return torch.cat([batch, self.classifier(netx)], dim=2)
 
     def predict_all(self, some_text):
         """
