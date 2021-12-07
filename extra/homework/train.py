@@ -19,7 +19,6 @@ def train(args):
     Hint: SGD might need a fairly high learning rate to work well here
 
     """
-    seq_len = 100
     optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 
     loss = torch.nn.CrossEntropyLoss()
@@ -28,7 +27,7 @@ def train(args):
     train_data = SpeechDataset('data/train.txt', transform=one_hot);
     valid_data = SpeechDataset('data/valid.txt', transform=one_hot);
 
-    def make_random_batch(batch_size, seq_len, is_train_data=True):
+    def make_random_batch(batch_size, is_train_data=True):
         B = []
         data = train_data if is_train_data else valid_data
         for i in range(batch_size):
@@ -41,7 +40,7 @@ def train(args):
         print("Training...")
         model.train()
         loss_vals, valid_loss_vals = [], []
-        batch = make_random_batch(args.batch_size, seq_len)
+        batch = make_random_batch(args.batch_size)
         batch_data = batch[:, :, :-1].to(device)
         batch_label = batch.argmax(dim=1).to(device)
         o = model(batch_data)
@@ -58,7 +57,7 @@ def train(args):
 
         model.eval()
         print("Validating...")
-        valid_batches = make_random_batch(args.batch_size, seq_len+1, is_train_data=False)
+        valid_batches = make_random_batch(args.batch_size, is_train_data=False)
         valid_batch_data = valid_batches[:, :, :-1].to(device)
         valid_batch_label = valid_batches.argmax(dim=1).to(device)
         valid_o = model(valid_batch_data)
