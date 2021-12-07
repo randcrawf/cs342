@@ -74,15 +74,15 @@ class TCN(torch.nn.Module, LanguageModel):
             super().__init__()
             self.net = torch.nn.Sequential(
                 torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
-                torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation),
+                torch.nn.utils.weight_norm(torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation)),
                 torch.nn.ReLU(),
                 torch.nn.Dropout(dropout),
-                torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation),
                 torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0),
+                torch.nn.utils.weight_norm(torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation)),
                 torch.nn.ReLU(),
                 torch.nn.Dropout(dropout),
             )
-            self.down = torch.nn.Conv1d(in_channels, out_channels, 1) if downsample else None
+            self.down = torch.nn.Conv1d(in_channels, out_channels, 1)
 
         def forward(self, x):
             out = self.net(x)
@@ -100,19 +100,18 @@ class TCN(torch.nn.Module, LanguageModel):
         self.softmax = torch.nn.LogSoftmax(dim=1)
 
         L = []
-        out_channels = 50
         in_channels = 28
         dilation_size = 1
         downsample = True
         for i in range(len(layers)):
-            L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=0.05, downsample=True)]
+            L += [self.CausalConv1dBlock(in_channels, layers[i], kernel_size, dilation=dilation_size, dropout=0.05, downsample=True)]
             downsample = not downsample
             dilation_size = 2 ** i
             in_channels = layers[i]
 
 
         self.network = torch.nn.Sequential(*L)
-        self.classifier = torch.nn.Conv1d(out_channels, 28, 1)
+        self.classifier = torch.nn.Conv1d(50, 28, 1)
         self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
 
     def forward(self, x):
@@ -130,7 +129,7 @@ class TCN(torch.nn.Module, LanguageModel):
         batch = torch.stack(stacks, dim=0)
 
         if (x.shape[2] == 0):
-            return torch.nn.LogSoftmax(batch, dim=1)
+            return self.softmax(batch)
 
         out = self.classifier(self.network(x))
         out = torch.cat([batch, out], dim=2)
@@ -144,7 +143,7 @@ class TCN(torch.nn.Module, LanguageModel):
         @return torch.Tensor((vocab_size, len(some_text)+1)) of log-likelihoods (not logits!)
         """
         one_hot = utils.one_hot(some_text)
-        p = self.softmax(self.forward(one_hot[:]))
+        p = self.softmax(self.forward(one_hot[None]))
         return p.view(one_hot.size(0), one_hot.size(1) + 1)
 
 

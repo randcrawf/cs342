@@ -101,7 +101,7 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
             topN.add(log_likelihood(model, c), c)
 
     count = 1
-    while count < max_length - 1:
+    while count < max_length:
         print(count)
         prev_beam = topN.elements.copy()
         topN = TopNHeap(beam_size)
