@@ -37,7 +37,6 @@ def train(args):
     global_step = 0
     for epoch in range(args.num_epoch):
         print("epoch #" + str(epoch))
-        print("Training...")
         model.train()
         loss_vals, valid_loss_vals = [], []
         batch = make_random_batch(args.batch_size)
@@ -56,7 +55,6 @@ def train(args):
         # train_logger.add_scalar('loss', avg_loss, global_step)
 
         model.eval()
-        print("Validating...")
         valid_batches = make_random_batch(args.batch_size, is_train_data=False)
         valid_batch_data = valid_batches[:, :, :-1].to(device)
         valid_batch_label = valid_batches.argmax(dim=1).to(device)
