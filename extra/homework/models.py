@@ -83,12 +83,10 @@ class TCN(torch.nn.Module, LanguageModel):
                 torch.nn.Dropout(dropout),
             )
             self.downsample = torch.nn.Conv1d(in_channels, out_channels, 1)
-            self.relu = torch.nn.ReLU()
 
         def forward(self, x):
             out = self.net(x)
-            res = x if self.downsample is None else self.downsample(x)
-            return self.relu(out + res)
+            return out + (x if self.downsample is None else self.downsample(x))
 
     def __init__(self, char=28, layers=[50]*8, kernel_size=3, dropout=0.05):
         """
@@ -100,14 +98,14 @@ class TCN(torch.nn.Module, LanguageModel):
         """
         super().__init__()
         L = []
-        num_levels = len(layers)
         out_channels = 28
+        in_channels = 28
         dilation_size = 1
-        for i in range(num_levels):
-            in_channels = char if i == 0 else layers[i - 1]
+        for i in len(layers):
             out_channels = layers[i]
             L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=dropout)]
             dilation_size = 2 ** i
+            in_channels = layers[i]
 
         self.network = torch.nn.Sequential(*L)
 
