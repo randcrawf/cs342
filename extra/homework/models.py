@@ -113,6 +113,7 @@ class TCN(torch.nn.Module, LanguageModel):
 
         self.network = torch.nn.Sequential(*L)
         self.classifier = torch.nn.Conv1d(out_channels, 28, 1)
+        self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
 
     def forward(self, x):
         """
@@ -123,7 +124,6 @@ class TCN(torch.nn.Module, LanguageModel):
         @return torch.Tensor((B, vocab_size, L+1)) a batch of log-likelihoods or logits
         """
 
-        self.first_char = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
         
         stacks = []
         for _ in range(x.shape[0]):
