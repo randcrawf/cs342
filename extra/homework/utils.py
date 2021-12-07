@@ -29,7 +29,7 @@ class SpeechDataset(Dataset):
     """
 
     def __init__(self, dataset_path, transform=None, max_len=250):
-        with open(dataset_path) as file:
+        with open(dataset_path, encoding='utf8') as file:
             st = file.read()
         st = st.lower()
         reg = re.compile('[^%s]' % vocab)

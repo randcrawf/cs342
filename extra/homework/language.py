@@ -15,16 +15,15 @@ def log_likelihood(model: LanguageModel, some_text: str):
     :param some_text:
     :return: float
     """
-    likelihood = 0.0
-    x = model.predict_all(some_text)
-    r = utils.one_hot(some_text)
-    for i in range(r.shape[0]):
-        for j in range(r.shape[1]):
-            item = r[i][j]
-            if(item == 1):
-                likelihood += x[i][j]
+    res = 0.
+    preds = model.predict_all(some_text)
+    oh = utils.one_hot(some_text)
+    for i in range(oh.shape[0]):
+        for j in range(oh.shape[1]):
+            if(oh[i][j] == 1):
+                res += preds[i][j]
 
-    return likelihood
+    return res
 
 
 def sample_random(model: LanguageModel, max_length: int = 100):
@@ -41,9 +40,9 @@ def sample_random(model: LanguageModel, max_length: int = 100):
     text = ""
     while(len(text) < max_length):
         index = 0
-        x = model.predict_all(text)[:,-1]
+        pred = model.predict_next(text)
 
-        index = torch.distributions.Categorical(logits=x).sample()
+        index = torch.distributions.Categorical(logits=pred).sample()
 
         text += utils.vocab[index]
         if text[len(text) - 1] == '.':
@@ -69,8 +68,6 @@ class TopNHeap:
 
     def add(self, val, s):
         from heapq import heappush, heapreplace
-        # print(val, s)
-        # print(self.elements)
         if len(self.elements) < self.N:
             heappush(self.elements, (val, s))
         elif self.elements[0] < (val, s):
@@ -93,78 +90,43 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
                                    This option favors longer strings.
     :return: A list of strings of size n_results
     """
-
-    all_found = False
+    
     topN = TopNHeap(beam_size)
-    if average_log_likelihood:
-        # c = 0
-        # while c > max_length and not all_found:
-        #     print(utils.vocab)
-        #     all_found = True
-        #     for i in range(len(topN.elements)):
-        #         val, s = topN.elements[i]
-        #         if s[-1] != '.':
-        #             all_found = False
-        #             preds = model.predict_all(s)
-                    
-        #             for j in range(len(preds)):
-        #                 c = chr(j + ord('a'))
-        #                 if j == len(utils.vocab) - 1:
-        #                     c = "."
-        #                 elif j == len(utils.vocab) - 2:
-        #                     c = " "
-        #                 topN.add(val + preds[j], s + c)
+    complete_sentences = TopNHeap(n_results)
+    for j in range(len(utils.vocab)):
+        c = utils.vocab[j]
+        if c == ".":
+            complete_sentences.add(log_likelihood(model, c), c)
+        else:
+            topN.add(log_likelihood(model, c), c)
 
-        #     c += 1
-        return [("" + str(i)) for i in range(n_results)]
-    else: 
-        count = 0
-        while count < max_length and not all_found:
-            print(count)
-            prev_beam = topN.elements.copy()
-            topN = TopNHeap(beam_size)
-            all_found = True
-            for i in range(1 if len(prev_beam) == 0 else len(prev_beam)):
-                if len(prev_beam) > 0:
-                    val, s = prev_beam[i]
-                    if s[-1] == '.':
-                        topN.add(val, s)
-                    else:
-                        all_found = False
-                        for j in range(len(utils.vocab)):
-                            c = chr(j + ord('a'))
-                            if j == len(utils.vocab) - 1:
-                                c = "."
-                            elif j == len(utils.vocab) - 2:
-                                c = " "
-                            topN.add(log_likelihood(model, s + c), s + c)
-                        # print("x4")
+    count = 1
+    while count < max_length:
+        print(count)
+        prev_beam = topN.elements.copy()
+        topN = TopNHeap(beam_size)
+        for i in range(len(prev_beam)):
+            val, s = prev_beam[i]
+            for j in range(len(utils.vocab)):
+                c = utils.vocab[j]
+                ll = log_likelihood(model, s + c) / (len(s) if average_log_likelihood else 1)
+                if c == ".":
+                    complete_sentences.add(ll, s + c)
                 else:
-                    all_found = False
-                    # print("x5")
-                    for j in range(len(utils.vocab)):
-                        c = chr(j + ord('a'))
-                        if j == len(utils.vocab) - 1:
-                            c = "."
-                        elif j == len(utils.vocab) - 2:
-                            c = " "
-                        topN.add(log_likelihood(model, c), c)
-                    # print("x6")
-            # print("x7")
-            count += 1
-    # print("x8")
-    results = TopNHeap(n_results)
+                    topN.add(ll, s + c)
+        count += 1
+
     for val, s in topN.elements:
-        results.add(val, s)
-    # print(topN.elements)
+        complete_sentences.add(val, s + ".")
+    
     res = ["" for _ in range(n_results)]
-    for i in range(len(results.elements)):
-        val, s = results.elements[i]
+    for i in range(len(complete_sentences.elements)):
+        val, s = complete_sentences.elements[i]
         res[i] = s
-    print(topN.elements)
+    print(complete_sentences.elements)
 
     return res
-        
+
 
 
 if __name__ == "__main__":

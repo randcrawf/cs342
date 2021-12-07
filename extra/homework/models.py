@@ -61,7 +61,7 @@ class AdjacentLanguageModel(LanguageModel):
 
 class TCN(torch.nn.Module, LanguageModel):
     class CausalConv1dBlock(torch.nn.Module):
-        def __init__(self, in_channels, out_channels, kernel_size, dilation):
+        def __init__(self, in_channels, out_channels, kernel_size, dilation, dropout):
             """
             Your code here.
             Implement a Causal convolution followed by a non-linearity (e.g. ReLU).
@@ -71,12 +71,31 @@ class TCN(torch.nn.Module, LanguageModel):
             :param kernel_size: Conv1d parameter
             :param dilation: Conv1d parameter
             """
-            raise NotImplementedError('CausalConv1dBlock.__init__')
+            super().__init__()
+            self.pad1 = torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0)
+            self.c1 = torch.nn.utils.weight_norm(
+                torch.nn.Conv1d(in_channels, out_channels, kernel_size, dilation=dilation))
+            self.relu1 = torch.nn.ReLU()
+            self.dropout1 = torch.nn.Dropout(dropout)
+
+            self.c2 = torch.nn.utils.weight_norm(torch.nn.Conv1d(out_channels, out_channels, kernel_size, dilation=dilation))
+
+            self.pad2 = torch.nn.ConstantPad1d(((kernel_size-1)*dilation,0), 0)
+            self.relu2 = torch.nn.ReLU()
+            self.dropout2 = torch.nn.Dropout(dropout)
+
+            self.net = torch.nn.Sequential(self.pad1,self.c1, self.relu1, self.dropout1,
+                                            self.pad2,self.c2, self.relu2, self.dropout2)
+
+            self.downsample = torch.nn.Conv1d(in_channels, out_channels, 1)
+            self.relu = torch.nn.ReLU()
 
         def forward(self, x):
-            raise NotImplementedError('CausalConv1dBlock.forward')
+            out = self.net(x)
+            res = x if self.downsample is None else self.downsample(x)
+            return self.relu(out + res)
 
-    def __init__(self):
+    def __init__(self, char=28, layers=[50]*8, kernel_size=3, dropout=0.05):
         """
         Your code here
 
@@ -84,7 +103,24 @@ class TCN(torch.nn.Module, LanguageModel):
         Hint: The probability of the first character should be a parameter
         use torch.nn.Parameter to explicitly create it.
         """
-        raise NotImplementedError('TCN.__init__')
+        super().__init__()
+        L = []
+        num_levels = len(layers)
+        out_channels = 28
+        dilation_size = 1
+        for i in range(num_levels):
+            in_channels = char if i == 0 else layers[i - 1]
+            out_channels = layers[i]
+            L += [self.CausalConv1dBlock(in_channels, out_channels, kernel_size, dilation=dilation_size, dropout=dropout)]
+            dilation_size = 2 ** i
+
+        self.network = torch.nn.Sequential(*L)
+
+        self.classifier = torch.nn.Conv1d(out_channels, 28, 1)
+
+        self.softmax = torch.nn.LogSoftmax(dim=1)
+
+        self.first = torch.nn.Parameter(torch.rand(28, 1), requires_grad=True)
 
     def forward(self, x):
         """
@@ -94,7 +130,20 @@ class TCN(torch.nn.Module, LanguageModel):
         @x: torch.Tensor((B, vocab_size, L)) a batch of one-hot encodings
         @return torch.Tensor((B, vocab_size, L+1)) a batch of log-likelihoods or logits
         """
-        raise NotImplementedError('TCN.forward')
+        def stack_param(param, input):
+            stacks = []
+            for i in range(input.shape[0]):
+                stacks.append(param)
+            batch = torch.stack(stacks, dim=0)
+            return batch
+
+        if (x.shape[2] == 0):
+            return self.softmax(stack_param(self.first, x))
+
+        output = self.classifier(self.network(x))
+        batch = stack_param(self.first, x)
+        output = torch.cat([batch, output], dim=2)
+        return output
 
     def predict_all(self, some_text):
         """
@@ -103,7 +152,11 @@ class TCN(torch.nn.Module, LanguageModel):
         @some_text: a string
         @return torch.Tensor((vocab_size, len(some_text)+1)) of log-likelihoods (not logits!)
         """
-        raise NotImplementedError('TCN.predict_all')
+        one_hot = utils.one_hot(some_text)
+        forward_output = self.forward(one_hot[None])
+        prob = self.softmax(forward_output)
+        forward_output = prob.view(one_hot.shape[0], one_hot.shape[1] + 1)
+        return forward_output
 
 
 def save_model(model):
