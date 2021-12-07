@@ -120,6 +120,7 @@ def beam_search(model: LanguageModel, beam_size: int, n_results: int = 10, max_l
     else: 
         count = 0
         while count < max_length and not all_found:
+            print(count)
             prev_beam = topN.elements.copy()
             topN = TopNHeap(beam_size)
             all_found = True
