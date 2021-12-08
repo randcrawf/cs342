@@ -39,12 +39,9 @@ def sample_random(model: LanguageModel, max_length: int = 100):
     """
     text = ""
     while(len(text) < max_length):
-        index = 0
         pred = model.predict_next(text)
 
-        index = torch.distributions.Categorical(logits=pred).sample()
-
-        text += utils.vocab[index]
+        text += utils.vocab[torch.distributions.Categorical(logits=pred).sample()]
         if text[-1] == '.':
             return text
     return text
