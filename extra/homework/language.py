@@ -45,8 +45,8 @@ def sample_random(model: LanguageModel, max_length: int = 100):
         index = torch.distributions.Categorical(logits=pred).sample()
 
         text += utils.vocab[index]
-        if text[len(text) - 1] == '.':
-            break
+        if text[-1] == '.':
+            return text
     return text
 
 
