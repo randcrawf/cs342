@@ -15,15 +15,11 @@ def log_likelihood(model: LanguageModel, some_text: str):
     :param some_text:
     :return: float
     """
-    res = 0.
-    preds = model.predict_all(some_text)
-    oh = utils.one_hot(some_text)
-    for i in range(oh.shape[0]):
-        for j in range(oh.shape[1]):
-            if(oh[i][j] == 1):
-                res += preds[i][j]
-
-    return res
+    pred = model.predict_all(some_text)
+    one_hot = utils.one_hot(some_text)
+    output = pred[:, :pred.size(1) - 1]
+    indices = torch.nonzero(one_hot == 1)
+    return sum(output[indices[:, 0], indices[:, 1]])
 
 
 def sample_random(model: LanguageModel, max_length: int = 100):
